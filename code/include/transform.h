@@ -7,8 +7,7 @@
 //
 
 #pragma once
-#ifndef functional_transform_h
-#define functional_transform_h
+#include <iterator>
 
 #include "utils.h"
 
@@ -127,4 +126,3 @@ namespace func{
     }
 }
 
-#endif

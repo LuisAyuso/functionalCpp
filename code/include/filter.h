@@ -5,13 +5,13 @@
 //  Created by Luis Ayuso on 18/02/15.
 //  Copyright (c) 2015 Luis Ayuso. All rights reserved.
 //
+#pragma once
+#include <iterator>
 
-#ifndef functional_filter_h
-#define functional_filter_h
 namespace func{
     
     template<typename Value, typename Source, typename Func>
-    struct f_iterator{
+    struct f_iterator: public std::iterator<std::forward_iterator_tag, Value>{
         
         Func& f;
         Source s;
@@ -110,17 +110,26 @@ namespace func{
         }
     };
     
+  //  template <typename N, typename C>
+  //  filter_t<N,C> filter(std::function<bool (N)>& f, C& c){
+  //      return filter_t<N,C>(f, c);
+  //  }
+  //  template <typename N,  typename C>
+  //  filter_t<N,C> filter(std::function<bool (N)>& f, C&& c){
+  //      return filter_t<N,C>(f, c);
+  //  }
+
     template <typename N, typename C>
-    filter_t<N,C> filter(std::function<bool (N)>& f, C& c){
+    filter_t<N,C> filter(std::function<bool (N)> f, C c){
         return filter_t<N,C>(f, c);
     }
-    template <typename N,  typename C>
-    filter_t<N,C> filter(std::function<bool (N)>& f, C&& c){
-        return filter_t<N,C>(f, c);
-    }
-    
+
+    //template <typename F, typename C>
+    //transform_t<typename get_lambda<F,C>::param_type, typename get_lambda<F,C>::return_type, C>
+    //transform(F f, C c){
+    //    return transform_t<typename get_lambda<F,C>::param_type, typename get_lambda<F,C>::return_type, C>(f,c);
+    //}
 }
 
 
 
-#endif
