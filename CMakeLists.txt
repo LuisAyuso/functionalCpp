@@ -26,7 +26,7 @@ add_executable(${PROJECT_NAME} ${sources} )
 # tests:
 # ======
 
-include (gtest)
+include (testing)
 
 file(GLOB_RECURSE test_sources "${CMAKE_CURRENT_SOURCE_DIR}/code/tests/*.cc" )
 
@@ -35,11 +35,12 @@ foreach( test_source ${test_sources} )
     get_filename_component (unit_test ${test_source} NAME_WE )
 
     include_directories( ${GTEST_INCLUDE_DIR} )
+    include_directories( ${GMOCK_INCLUDE_DIR} )
     add_definitions(-DGTEST_COLOR ) 
     add_executable (${unit_test} ${test_source})
-    target_link_libraries(${unit_test} ${GTEST_LIBRARY})
-    target_link_libraries(${unit_test} ${GTEST_LIBRARY_WITH_MAIN})
-    add_dependencies(${unit_test} googletest)
+
+    target_link_libraries(${unit_test} libgtest libgtest_main libgmock)
+
     add_test (${unit_test} ${unit_test} )
 
 endforeach(test_source)

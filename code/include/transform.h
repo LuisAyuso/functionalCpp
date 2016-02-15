@@ -15,15 +15,16 @@
 namespace func{
     
     template<typename Value, typename Source, typename Func>
-    struct m_iterator{
-        
-        Func& f;
+    struct m_iterator : public std::iterator<std::forward_iterator_tag, Value>{
+
+        Func f;
         Source s;
         
         using self_type = m_iterator<Value, Source, Func>;
+
+        //m_iterator():f(), s(){}
         
-        //TODO: standard says default constructed
-        m_iterator(Func& f, const Source s)
+        m_iterator(Func f, const Source s)
         :f(f), s(s) {}
         
         template <typename A, typename B, typename F>
@@ -60,14 +61,14 @@ namespace func{
         Value operator->(){
             return f(*s);
         }
-        
+
         self_type& operator++(){
-            ++s;
+            s++;
             return *this;
         }
         self_type operator++(int){
             self_type cpy= *this;
-            ++s;
+            s++;
             return cpy;
         }
     };
@@ -79,7 +80,7 @@ namespace func{
         static_assert(validate_container_function<N, C>::value,
                       "the function does not accept the collection type as paramenter");
         
-//        statuc_assert(typename std::is_reference<C>::value,
+//        static_assert(typename std::is_reference<C>::value,
 //                      "this must be a reference type");
         
         using value_type = R;
@@ -105,15 +106,11 @@ namespace func{
         }
         
         const_iterator begin() const{
-            return const_iterator(func, storage.begin());
+            return const_iterator(&func, storage.begin());
         }
         
         const_iterator end() const{
-            return const_iterator(func, storage.end());
-        }
-        
-        operator std::vector<R>(){
-            return std::vector<R>(begin(), end());
+            return const_iterator(&func, storage.end());
         }
     };
     
