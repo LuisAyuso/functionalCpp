@@ -1,47 +1,26 @@
-########################### GTEST
-# Enable ExternalProject CMake module
-INCLUDE(ExternalProject)
 
-# Set default ExternalProject root directory
-SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/third_party)
+cmake_minimum_required(VERSION 2.8.8)
+project(gtest_builder C CXX)
+include(ExternalProject)
 
-# Add gtest
-# http://stackoverflow.com/questions/9689183/cmake-googletest
-ExternalProject_Add(
-    googletest
-    #URL http://googletest.googlecode.com/files/gtest-1.6.0.zip
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    TIMEOUT 2
-    # # Force separate output paths for debug and release builds to allow easy
-    # # identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
-    # CMAKE_ARGS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
-    #            -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
-    #            -Dgtest_force_shared_crt=ON
-    # Disable install step
+ExternalProject_Add(googletest
+    #    GIT_REPOSITORY https://github.com/google/googletest.git
+    URL https://github.com/google/googletest/archive/release-1.7.0.tar.gz
+    CMAKE_ARGS -Dgtest_force_shared_crt=ON
+               -DBUILD_GTEST=ON
+     PREFIX "${CMAKE_CURRENT_BINARY_DIR}"
+# Disable install step
     INSTALL_COMMAND ""
-    # Wrap download, configure and build steps in a script to log output
-    LOG_DOWNLOAD ON
-    LOG_CONFIGURE ON
-    LOG_BUILD ON)
+)
 
 # Specify include dir
 ExternalProject_Get_Property(googletest source_dir)
 set(GTEST_INCLUDE_DIR ${source_dir}/include)
 
-# Library
+# Specify MainTest's link libraries
 ExternalProject_Get_Property(googletest binary_dir)
-set(GTEST_LIBRARY_PATH ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a)
-set(GTEST_LIBRARY gtest)
-add_library(${GTEST_LIBRARY} UNKNOWN IMPORTED)
-set_property(TARGET ${GTEST_LIBRARY} PROPERTY IMPORTED_LOCATION
-                ${GTEST_LIBRARY_PATH} )
-add_dependencies(${GTEST_LIBRARY} googletest)
+set(GTEST_LIBS_DIR ${binary_dir})
 
-# Library
-set(GTEST_LIBRARY_PATH ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a)
-set(GTEST_LIBRARY_WITH_MAIN gtest_main)
-add_library(${GTEST_LIBRARY_WITH_MAIN} UNKNOWN IMPORTED)
-set_property(TARGET ${GTEST_LIBRARY_WITH_MAIN} PROPERTY IMPORTED_LOCATION
-                ${GTEST_LIBRARY_PATH} )
-add_dependencies(${GTEST_LIBRARY_WITH_MAIN} googletest)
 
+set(GTEST_LIBRARY ${GTEST_LIBS_DIR}/libgtest.a)
+set(GTEST_LIBRARY_WITH_MAIN ${GTEST_LIBS_DIR}/libgtest_main.a)

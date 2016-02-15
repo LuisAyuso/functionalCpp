@@ -20,7 +20,6 @@ file(GLOB_RECURSE sources "${CMAKE_CURRENT_SOURCE_DIR}/code/src/*.cpp" )
 #   include path, compiler flags
 include_directories ( "code/include/" )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 add_executable(${PROJECT_NAME} ${sources} )
 
 
@@ -29,7 +28,7 @@ add_executable(${PROJECT_NAME} ${sources} )
 
 include (gtest)
 
-file(GLOB_RECURSE test_sources "${CMAKE_CURRENT_SOURCE_DIR}/code/test/*.cc" )
+file(GLOB_RECURSE test_sources "${CMAKE_CURRENT_SOURCE_DIR}/code/tests/*.cc" )
 
 foreach( test_source ${test_sources} )
 
@@ -40,6 +39,7 @@ foreach( test_source ${test_sources} )
     add_executable (${unit_test} ${test_source})
     target_link_libraries(${unit_test} ${GTEST_LIBRARY})
     target_link_libraries(${unit_test} ${GTEST_LIBRARY_WITH_MAIN})
+    add_dependencies(${unit_test} googletest)
     add_test (${unit_test} ${unit_test} )
 
 endforeach(test_source)
