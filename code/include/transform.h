@@ -22,7 +22,7 @@ namespace func{
         
         using self_type = TransforIterator<Value, Source, Func>;
 
-        TransforIterator(Func f, const Source s)
+        TransforIterator(Func f, const Source s, const Source)
         :f(f), s(s) {}
         
         template <typename A, typename B, typename F>
@@ -75,7 +75,7 @@ namespace func{
    template <typename N, typename R, typename C, typename Storage_type> 
     using transform_t = detail::chaineable_t<
                             N, R,C,Storage_type, // forward paramenters
-                            TransforIterator<R,typename std::remove_reference<C>::type::iterator,std::function<R(N)>> // specific iterator type for transformation
+                            TransforIterator<R, typename C::iterator, std::function<R(N)>> // specific iterator type for transformation
                                 >;
 
 

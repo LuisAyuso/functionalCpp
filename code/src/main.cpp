@@ -130,7 +130,7 @@ int main(int argc, const char * argv[]) {
         
         std::vector<int> v;
         for (int i =0;i<10;i++) v.push_back(i);
-        std::function<bool (float)> f = [](int a) ->bool { return a>5; };
+        std::function<bool (int)> f = [](int a) ->bool { return a>5; };
 
         auto x = func::filter(f, v);
         for (auto it : x)

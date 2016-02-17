@@ -40,28 +40,28 @@ TEST(Filter, inline_lambda){
         std::vector<int> res (x.begin(), x.end());
         EXPECT_THAT(res, ElementsAre(1,3,5,7,9));
     }
-//   
-//TEST(Filter, x_value){
-//        // X value
-//        std::function<int (int)> f =[](int x) -> int {return x * 2;};
-//        auto x = func::transform(f, std::vector<int>({1,2,3,4,5}));
-//        
-//        std::vector<int> res (x.begin(), x.end());
-//        EXPECT_THAT(res, ElementsAre(2,4,6,8,10));
-//    }
-//    
-//TEST(Filter, std_function){
-//        // function type
-//        std::map<int, float> m;
-//        m[1] = 0.0;
-//        m[2] = 0.1;
-//        std::function<int (std::pair<const int,float>)> f =[](std::pair<int, float> x) -> int {return x.first;};
-//        auto x = func::transform(f,m);
-//        
-//        std::vector<int> res (x.begin(), x.end());
-//        EXPECT_THAT(res, ElementsAre(1,2));
-//    }
-//    
+   
+TEST(Filter, x_value){
+        // X value
+        std::function<int (int)> f =[](int x) -> bool {return x%2;};
+        auto x = func::filter(f, std::vector<int>({1,2,3,4,5}));
+        
+        std::vector<int> res (x.begin(), x.end());
+        EXPECT_THAT(res, ElementsAre(1,3,5));
+    }
+    
+TEST(Filter, std_function){
+        // function type
+        std::map<int, int> m;
+        m[1] = 1;
+        m[2] = 1;
+        std::function< bool (std::pair<const int,int>)> f =[](std::pair<int, int> x) -> bool {return x.first == x.second;};
+        auto x = func::filter(f,m);
+        
+        std::vector<std::pair<const int, int>> res (x.begin(), x.end());
+        EXPECT_EQ(res.size(), 1);
+    }
+    
 //TEST(Filter, chain){
 //        // four steps chained.
 //        // - variable lambda

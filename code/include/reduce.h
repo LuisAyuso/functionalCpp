@@ -9,34 +9,58 @@
 #ifndef functional_reduce_h
 #define functional_reduce_h
 
+#include <functional>
+#include "utils.h"
 
 namespace func{
     
-    template <typename N, typename C>
-    N reduce_aux(std::function<N (N, N)>& f, C& c){
+    template <typename N, typename R, typename C>
+    N reduce_aux(std::function<R (R, N)>& f, C& c, R def){
         auto it = c.begin();
         if (it != c.end()){
-            
-            N value = *it;
-            ++it;
-            
+            R value = def;
             while (it != c.end()){
                 value = f(value, *it);
                 ++it;
             }
             return value;
         }
-        // todo, drop an exception or something?
-        return N();
+        return def;
     }
 
     
-    template <typename N, typename C>
-    N reduce(std::function<N (N, N)>& f, C& c){ return reduce_aux(f, c);}
+    // for function type
+    // lvalue collection
+    template <typename N, typename R, typename C>
+    R reduce(std::function<R (R,N)> f, C& c, R def = R()){
+        return reduce_aux(f,c,def);
+    }
 
-    template <typename N, typename C>
-    N reduce(std::function<N (N, N)>& f, C&& c){ return reduce_aux(f, c);}
+    // for function type
+    // rvalue collection
+    template <typename N, typename R, typename C>
+    R reduce(std::function<R (R,N)> f, C&& c, R def = R()){
+        return reduce_aux(f, c, def);
+    }
 
-}
+    // for lambda type
+    // lvalue collection
+    template <typename F, typename R, typename C>
+    R reduce(F f, C& c, R def){
+        using N = typename C::value_type;
+        std::function<R(R,N)> func = f;
+        return reduce_aux(func, c, def);
+    }
+
+    // for lambda type
+    // xvalue collection
+    template <typename F, typename R, typename C>
+    R reduce(F f, C&& c, R def){
+        using N = typename C::value_type;
+        std::function<R(R,N)> func = f;
+        return reduce_aux(func, c, def);
+    }
+
+} // func namespace
 
 #endif
