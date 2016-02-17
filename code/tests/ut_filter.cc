@@ -32,8 +32,10 @@ TEST(Filter, inline_lambda){
         // inline lambda
         std::vector<int> v;
         for (int i =0;i<10;i++) v.push_back(i);
+                
+        auto f = [](int a) -> bool{ return a%2; };
         
-        auto x = func::filter([](int a) -> bool{ return a%2; }, v);
+        auto x = func::filter(f, v);
         
         std::vector<int> res (x.begin(), x.end());
         EXPECT_THAT(res, ElementsAre(1,3,5,7,9));

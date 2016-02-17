@@ -11,6 +11,10 @@ ExternalProject_Add(
     gtest
     URL https://googletest.googlecode.com/files/gtest-1.7.0.zip
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
+    # forward toolchain
+    CMAKE_ARGS 
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} -DCMAKE_C_COMPILER_ARG1=${CMAKE_C_COMPILER_ARG1}
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_CXX_COMPILER_ARG1=${CMAKE_CXX_COMPILER_ARG1}
     # Disable install step
     INSTALL_COMMAND ""
 )
@@ -39,6 +43,10 @@ ExternalProject_Add(
     gmock
     URL https://googlemock.googlecode.com/files/gmock-1.7.0.zip
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gmock
+    # forward toolchain
+    CMAKE_ARGS 
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} -DCMAKE_C_COMPILER_ARG1=${CMAKE_C_COMPILER_ARG1}
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} -DCMAKE_CXX_COMPILER_ARG1=${CMAKE_CXX_COMPILER_ARG1}
     # Disable install step
     INSTALL_COMMAND ""
 )

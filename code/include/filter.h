@@ -7,6 +7,9 @@
 //
 #pragma once
 #include <iterator>
+#include <functional>
+
+#include "utils.h"
 
 namespace func{
     
@@ -82,12 +85,12 @@ namespace func{
     struct filter_t{
         
         C& storage;
-        std::function<bool (N)>& func;
+        std::function<bool (N)> func;
         
         using iterator = f_iterator<N, typename C::iterator, std::function<bool (N)>>;
         using const_iterator = const f_iterator<N, typename C::iterator, std::function<bool (N)>>;
         
-        filter_t(std::function<bool (N)>& f, C& c)
+        filter_t(std::function<bool (N)> f, C& c)
         :storage(c), func(f){}
         
         iterator begin(){
@@ -104,10 +107,6 @@ namespace func{
         const_iterator end() const{
             return const_iterator(func, storage.end());
         }
-        
-        operator std::vector<N>(){
-            return std::vector<N>(begin(), end());
-        }
     };
     
   //  template <typename N, typename C>
@@ -120,15 +119,15 @@ namespace func{
   //  }
 
     template <typename N, typename C>
-    filter_t<N,C> filter(std::function<bool (N)> f, C c){
+    filter_t<N,C> filter(std::function<bool (N)> f, C& c){
         return filter_t<N,C>(f, c);
     }
 
-    //template <typename F, typename C>
-    //transform_t<typename get_lambda<F,C>::param_type, typename get_lambda<F,C>::return_type, C>
-    //transform(F f, C c){
-    //    return transform_t<typename get_lambda<F,C>::param_type, typename get_lambda<F,C>::return_type, C>(f,c);
-    //}
+    template <typename F, typename C>
+    filter_t<typename get_lambda<F,C>::param_type, C>
+    filter(F f, C& c){
+        return filter_t<typename get_lambda<F,C>::param_type, C>(f,c);
+    }
 }
 
 

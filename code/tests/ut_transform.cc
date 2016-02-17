@@ -1,9 +1,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-
-
-
 #include <iostream>
 #include <functional>
 #include <vector>
@@ -55,14 +52,14 @@ TEST(Transform, inline_lambda){
         EXPECT_THAT(res, ElementsAre(-1,0,1,2,3,4,5,6,7,8));
 }
    
-TEST(Transform, x_value){
-        // X value
-        std::function<int (int)> f =[](int x) -> int {return x * 2;};
-        auto x = func::transform(f, std::vector<int>({1,2,3,4,5}));
-        
-        std::vector<int> res (x.begin(), x.end());
-        EXPECT_THAT(res, ElementsAre(2,4,6,8,10));
-}
+//TEST(Transform, x_value){
+//        // X value
+//        std::function<int (int)> f =[](int x) -> int {return x * 2;};
+//        auto x = func::transform(f, std::vector<int>({1,2,3,4,5}));
+//        
+//        std::vector<int> res (x.begin(), x.end());
+//        EXPECT_THAT(res, ElementsAre(2,4,6,8,10));
+//}
     
 TEST(Transform, std_function){
         // function type
@@ -254,5 +251,4 @@ std::cout << "yo! " << std::endl;
         std::cout << std::endl;
     }
 }
-
 

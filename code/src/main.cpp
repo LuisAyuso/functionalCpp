@@ -74,36 +74,36 @@ int main(int argc, const char * argv[]) {
         }
     }
     
-    std::cout << "=============" << std::endl;
-    {
-        // four steps chained.
-        // - variable lambda
-        // - inline lamba
-        // - function type
-        // - functor
-        
-        std::list<int> l = { 0,1,2,3,4,5};
-        
-        auto lambda1 = [](int a) -> int { return a+1; };
-        std::function<int (int)> lambda2 = [](int a) -> int { return a+1; };
-        struct Lambda3{
-            int operator()(int a){
-                return a+1;
-            }
-        } lambda3;
-        
-        auto x = func::transform(lambda1,
-                                 func::transform([](int a){return a+1;},
-                                                 func::transform(lambda2,
-                                                                 func::transform(lambda3, l))));
-      
-        for(int v : x)
-        std::cout << v << std::endl;
-        
-//        std::vector<int> res(x.begin(), x.end());
-    //    std::vector<int> res(l.begin(), l.end());
-        
-    }
+//    std::cout << "=============" << std::endl;
+//    {
+//        // four steps chained.
+//        // - variable lambda
+//        // - inline lamba
+//        // - function type
+//        // - functor
+//        
+//        std::list<int> l = { 0,1,2,3,4,5};
+//        
+//        auto lambda1 = [](int a) -> int { return a+1; };
+//        std::function<int (int)> lambda2 = [](int a) -> int { return a+1; };
+//        struct Lambda3{
+//            int operator()(int a){
+//                return a+1;
+//            }
+//        } lambda3;
+//        
+//        auto x = func::transform(lambda1,
+//                                 func::transform([](int a){return a+1;},
+//                                                 func::transform(lambda2,
+//                                                                 func::transform(lambda3, l))));
+//      
+//        for(int v : x)
+//        std::cout << v << std::endl;
+//        
+////        std::vector<int> res(x.begin(), x.end());
+//    //    std::vector<int> res(l.begin(), l.end());
+//        
+//    }
     
     
     std::cout << "=============" << std::endl;
