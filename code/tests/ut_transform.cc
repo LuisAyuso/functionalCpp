@@ -207,15 +207,12 @@ protected:
     std::array<float,BenchmarkSize> res;
 
     virtual void SetUp() {
-    std::cout << "start! " << std::endl;
-
         std::random_device rd;
         std::uniform_int_distribution<int> dist(0, 999);
 
         for (unsigned i = 0; i < BenchmarkSize; ++i){
             input[i] = dist(rd);
         }
-    std::cout << "stop! " << std::endl;
     }
 
     //virtual void TearDown() { }
@@ -236,8 +233,6 @@ TEST_F(BenchmarkArrayTest, Base){
 
 TEST_F(BenchmarkArrayTest, func){
 
-std::cout << "yo! " << std::endl;
-
     auto x = func::transform([](float a){ return a-1; },
              func::transform([](float a){ return a/4; },
              func::transform([](float a){ return a*3; },
@@ -245,10 +240,8 @@ std::cout << "yo! " << std::endl;
 
     auto it = x.begin();
     for (unsigned i = 0; i < BenchmarkSize; ++i){
-        std::cout << "-" << i << " (" << *it << ")";
         res[i] = *it;
         ++it;
-        std::cout << std::endl;
     }
 }
 
