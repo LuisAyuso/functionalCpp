@@ -21,7 +21,8 @@ is an attempt to implement chainable user defined operations for C++.
 
 ## In the roadmap:
 
-  + Make it perform, right now, experimental code and might not perform well.
   + More awareness of the iterators, random acces iterator provided when available (Transform)
-  + Parallelism. Pipelining. 
+  + IO. Functional containers can manipulate infinite input streams. Lets implement some File and/or network sources.
+  + Parallelism: When random access iterators are available, we can chunk it and process in parallel.
+  + Pipelining: When there are no random access iterators, we can buffer part of the computation and pipeline it over the processors.
 
