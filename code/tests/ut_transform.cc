@@ -29,20 +29,20 @@ TEST(Transform, lambda1){
 
 struct Copy_count {
 
-    std::vector<int> vec;
-
     using value_type = int;
     using iterator = std::vector<int>::iterator;
     using const_iterator = std::vector<int>::const_iterator;
 
+    std::vector<int> vec;
     unsigned& cpy;
     unsigned& mv;
-    Copy_count (unsigned& cpy, unsigned& mv) : cpy(cpy), mv(mv){}
-    Copy_count (const Copy_count& o): cpy(o.cpy), mv(o.mv) { cpy++; }
-    Copy_count ( Copy_count&& o): cpy(o.cpy), mv(o.mv) { mv++; }
 
-    iterator begin() { return vec.begin(); }
-    iterator end()   { return vec.end(); }
+    Copy_count (unsigned& cpy, unsigned& mv) : vec(100), cpy(cpy), mv(mv){}
+    Copy_count (const Copy_count& o): vec(o.vec), cpy(o.cpy), mv(o.mv) { cpy++; }
+    Copy_count ( Copy_count&& o): vec(o.vec), cpy(o.cpy), mv(o.mv) { mv++; }
+
+    decltype(vec.begin()) begin() { return vec.begin(); }
+    decltype(vec.end()) end() { return vec.end(); }
 };
 
 TEST(Transform, check_copys){
@@ -65,9 +65,12 @@ TEST(Transform, check_copys){
 
         std::vector<int> res (x.begin(), x.end());
 
+        EXPECT_EQ(res.size(), 100);
         EXPECT_EQ(mv, 0);
         EXPECT_EQ(cpy, 0);
 }
+
+
 TEST(Transform, check_moves){
 
         unsigned cpy = 0;
@@ -87,7 +90,58 @@ TEST(Transform, check_moves){
 
         std::vector<int> res (x.begin(), x.end());
 
-        EXPECT_EQ(mv, 5);
+        EXPECT_EQ(res.size(), 100);
+        EXPECT_EQ(mv, 10);  // 2 moves per chain (create storage, and move in chainable)
+        EXPECT_EQ(cpy, 0);
+}
+
+
+struct Copy_count_functor{
+
+    unsigned& cpy;
+    unsigned& mv;
+
+    Copy_count_functor(unsigned& cpy, unsigned& mv) : cpy(cpy), mv(mv){}
+    Copy_count_functor(const Copy_count& o): cpy(o.cpy), mv(o.mv) { cpy++; }
+    Copy_count_functor(Copy_count&& o): cpy(o.cpy), mv(o.mv)      { mv++; }
+
+    Copy_count_functor& operator= (const Copy_count_functor& o) = delete;
+    
+    int operator() (int a){ return a; }
+};
+
+TEST(Transform, functor_copies){
+
+        unsigned cpy = 0;
+        unsigned mv = 0;
+
+        Copy_count_functor a(cpy, mv);
+        Copy_count_functor b(cpy, mv);
+        std::vector<int> v(100);
+
+        auto x = func::transform(a, 
+                 func::transform(b, v));
+
+        std::vector<int> res (x.begin(), x.end());
+
+        EXPECT_EQ(res.size(), 100);
+        EXPECT_EQ(mv, 0);
+        EXPECT_EQ(cpy, 0);
+}
+
+TEST(Transform, functor_moves){
+
+        unsigned cpy = 0;
+        unsigned mv = 0;
+
+        std::vector<int> v(100);
+
+        auto x = func::transform(Copy_count_functor(cpy, mv), v);
+
+        std::vector<int> res (x.begin(), x.end());
+
+        EXPECT_EQ(res.size(), 100);
+        EXPECT_EQ(mv, 0);
         EXPECT_EQ(cpy, 0);
 }
 
@@ -199,7 +253,7 @@ TEST_F(BenchmarkVectorTest, Base){
     }
 }
 
-TEST_F(BenchmarkVectorTest, func){
+TEST_F(BenchmarkVectorTest, post_func){
 
     auto x = func::transform([](float a){ return a-1; },
              func::transform([](float a){ return a/4; },
@@ -210,6 +264,19 @@ TEST_F(BenchmarkVectorTest, func){
     for (unsigned i = 0; i < BenchmarkSize; ++i){
         res[i] = *it;
         it ++;
+    }
+}
+TEST_F(BenchmarkVectorTest, pre_func){
+
+    auto x = func::transform([](float a){ return a-1; },
+             func::transform([](float a){ return a/4; },
+             func::transform([](float a){ return a*3; },
+             func::transform([](float a){ return a+1; }, input))));
+
+    auto it = x.begin();
+    for (unsigned i = 0; i < BenchmarkSize; ++i){
+        res[i] = *it;
+        ++it ;
     }
 }
 
@@ -267,7 +334,7 @@ TEST_F(BenchmarkListTest, Base){
     }
 }
 
-TEST_F(BenchmarkListTest, func){
+TEST_F(BenchmarkListTest, post_func){
 
     auto x = func::transform([](float a){ return a-1; },
              func::transform([](float a){ return a/4; },
@@ -276,6 +343,19 @@ TEST_F(BenchmarkListTest, func){
 
     for (auto it = x.begin(); it != x.end(); ++it){
         res.push_back(*it);
+        it++;
+    }
+}
+TEST_F(BenchmarkListTest, pre_func){
+
+    auto x = func::transform([](float a){ return a-1; },
+             func::transform([](float a){ return a/4; },
+             func::transform([](float a){ return a*3; },
+             func::transform([](float a){ return a+1; }, input))));
+
+    for (auto it = x.begin(); it != x.end(); ++it){
+        res.push_back(*it);
+        ++it;
     }
 }
 
@@ -338,7 +418,21 @@ TEST_F(BenchmarkArrayTest, Base){
     }
 }
 
-TEST_F(BenchmarkArrayTest, func){
+TEST_F(BenchmarkArrayTest, post_func){
+
+    auto x = func::transform([](float a){ return a-1; },
+             func::transform([](float a){ return a/4; },
+             func::transform([](float a){ return a*3; },
+             func::transform([](float a){ return a+1; }, input))));
+
+    auto it = x.begin();
+    for (unsigned i = 0; i < BenchmarkSize; ++i){
+        res[i] = *it;
+        it++;
+    }
+}
+
+TEST_F(BenchmarkArrayTest, pre_func){
 
     auto x = func::transform([](float a){ return a-1; },
              func::transform([](float a){ return a/4; },

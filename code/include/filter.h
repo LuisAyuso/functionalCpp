@@ -91,14 +91,14 @@ namespace func{
     // lvalue collection
     template <typename N, typename R, typename C>
     filter_t<N,C,detail::Reference_storage> filter(std::function<R (N)> f, C& c){
-        return filter_t<N,C,detail::Reference_storage> (f, detail::transform_store_t<C,detail::Reference_storage> (c));
+        return filter_t<N,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
     }
 
     // for function type
     // rvalue collection
     template <typename N, typename R, typename C>
     filter_t<N,C,detail::Value_storage> filter(std::function<R (N)> f, C&& c){
-        return filter_t<N,C,detail::Value_storage> (f, detail::transform_store_t<C,detail::Value_storage> (std::move(c)));
+        return filter_t<N,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
     }
 
     // for lambda type
@@ -108,7 +108,7 @@ namespace func{
     filter(F f, C& c){
         using N = typename get_lambda<F,C>::param_type;
         using R = typename get_lambda<F,C>::return_type;
-        return filter_t<N,C,detail::Reference_storage> (f, detail::transform_store_t<C,detail::Reference_storage> (c));
+        return filter_t<N,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
     }
 
     // for lambda type
@@ -118,7 +118,7 @@ namespace func{
     filter(F f, C&& c){
         using N = typename get_lambda<F,C>::param_type;
         using R = typename get_lambda<F,C>::return_type;
-        return filter_t<N,C,detail::Value_storage> (f, detail::transform_store_t<C,detail::Value_storage> (std::move(c)));
+        return filter_t<N,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
     }
 }
 

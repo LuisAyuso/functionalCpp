@@ -22,34 +22,34 @@ namespace detail{
 
 
     template<typename C, typename Storage>
-    struct transform_store_t;
+    struct chaineable_store_t;
 
     template<typename C>
-    struct transform_store_t<C,Reference_storage>{
+    struct chaineable_store_t<C,Reference_storage>{
 
         C& storage;
 
-        transform_store_t(C& c)
+        chaineable_store_t(C& c)
         :storage(c) {}
 
-        transform_store_t(transform_store_t&& t)
+        chaineable_store_t(chaineable_store_t&& t)
         :storage(t.storage) {}
 
-        transform_store_t(const transform_store_t&) = delete;
+        chaineable_store_t(const chaineable_store_t&) = delete;
     };
 
     template<typename C>
-    struct transform_store_t<C,Value_storage>{
+    struct chaineable_store_t<C,Value_storage>{
 
         C storage;
 
-        transform_store_t(C&& c)
+        chaineable_store_t(C&& c)
         :storage(std::move(c)) {}
 
-        transform_store_t(transform_store_t&& t)
+        chaineable_store_t(chaineable_store_t&& t)
         :storage(std::move(t.storage)) {}
 
-        transform_store_t(const transform_store_t&) = delete;
+        chaineable_store_t(const chaineable_store_t&) = delete;
     };
     
     template<typename N,                // container element type
@@ -65,7 +65,7 @@ namespace detail{
         
         using value_type = R;
         using function_type = std::function<R (N)>;
-        using storage_t = detail::transform_store_t<C, Storage_type>;
+        using storage_t = detail::chaineable_store_t<C, Storage_type>;
 
         function_type func;
         storage_t store;
@@ -77,6 +77,9 @@ namespace detail{
         
         chaineable_t (const chaineable_t & ) = delete;
         chaineable_t (chaineable_t&& o) :func(o.func), store(std::move(o.store)) {}
+
+        chaineable_t operator= (const chaineable_t&) = delete;
+        chaineable_t operator= (chaineable_t&&) = delete;
         
         iterator begin(){
             return iterator(func, store.storage.begin(), store.storage.end());

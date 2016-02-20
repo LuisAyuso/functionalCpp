@@ -83,14 +83,14 @@ namespace func{
     // lvalue collection
     template <typename N, typename R, typename C>
     transform_t<N,R,C,detail::Reference_storage> transform(std::function<R (N)> f, C& c){
-        return transform_t<N,R,C,detail::Reference_storage> (f, detail::transform_store_t<C,detail::Reference_storage> (c));
+        return transform_t<N,R,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
     }
 
     // for function type
     // rvalue collection
     template <typename N, typename R, typename C>
     transform_t<N,R,C,detail::Value_storage> transform(std::function<R (N)> f, C&& c){
-        return transform_t<N,R,C,detail::Value_storage> (f, detail::transform_store_t<C,detail::Value_storage> (std::move(c)));
+        return transform_t<N,R,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
     }
 
     // for lambda type
@@ -100,7 +100,7 @@ namespace func{
     transform(F f, C& c){
         using N = typename get_lambda<F,C>::param_type;
         using R = typename get_lambda<F,C>::return_type;
-        return transform_t<N,R,C,detail::Reference_storage> (f, detail::transform_store_t<C,detail::Reference_storage> (c));
+        return transform_t<N,R,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
     }
 
     // for lambda type
@@ -110,7 +110,7 @@ namespace func{
     transform(F f, C&& c){
         using N = typename get_lambda<F,C>::param_type;
         using R = typename get_lambda<F,C>::return_type;
-        return transform_t<N,R,C,detail::Value_storage> (f, detail::transform_store_t<C,detail::Value_storage> (std::move(c)));
+        return transform_t<N,R,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
     }
 }
 
