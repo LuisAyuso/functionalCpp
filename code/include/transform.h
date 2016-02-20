@@ -17,12 +17,12 @@ namespace func{
     template<typename Value, typename Source, typename Func>
     struct TransforIterator : public std::iterator<std::input_iterator_tag, Value>{
 
-        Func f;
+        Func& f;
         Source s;
         
         using self_type = TransforIterator<Value, Source, Func>;
 
-        TransforIterator(Func f, const Source s, const Source)
+        TransforIterator(Func& f, const Source s, const Source)
         :f(f), s(s) {}
         
         template <typename A, typename B, typename F>
