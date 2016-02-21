@@ -29,6 +29,21 @@ namespace func{
                 ++s;
             }
         }
+
+        FilterIterator(const FilterIterator& o)
+          : f(o.f), s(o.s), end(o.end) { }
+
+        FilterIterator(FilterIterator&& o)
+          : f(o.f), s(std::move(o.s)), end(std::move(o.end)) { }
+
+        FilterIterator& operator= (const FilterIterator& o){
+            abort();
+            return *this;
+        }
+        FilterIterator& operator= (FilterIterator&& o){
+            abort();
+            return *this;
+        }
         
         template <typename A, typename B, typename F>
         FilterIterator(const FilterIterator<A,B,F>& o)
@@ -83,9 +98,9 @@ namespace func{
     
     template<typename N, typename C, typename Storage_type>
         using filter_t = detail::chaineable_t<
-                       N, bool, C, Storage_type, 
-                        FilterIterator<N, typename C::iterator, std::function<bool(N)>>
-                            >;
+                                    N, bool, C, Storage_type,
+                                    FilterIterator<N, typename C::iterator, std::function<bool(N)>>
+                                >;
 
     // for function type
     // lvalue collection
@@ -107,7 +122,6 @@ namespace func{
     filter_t<typename get_lambda<F,C>::param_type, C, detail::Reference_storage>
     filter(F f, C& c){
         using N = typename get_lambda<F,C>::param_type;
-        using R = typename get_lambda<F,C>::return_type;
         return filter_t<N,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
     }
 
@@ -117,7 +131,6 @@ namespace func{
     filter_t<typename get_lambda<F,C>::param_type, C, detail::Value_storage>
     filter(F f, C&& c){
         using N = typename get_lambda<F,C>::param_type;
-        using R = typename get_lambda<F,C>::return_type;
         return filter_t<N,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
     }
 }

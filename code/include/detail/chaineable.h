@@ -14,12 +14,9 @@
 namespace func{
 namespace detail{
     
-    struct Reference_storage{
-    };
+    struct Reference_storage{ };
 
-    struct Value_storage{
-    };
-
+    struct Value_storage{ };
 
     template<typename C, typename Storage>
     struct chaineable_store_t;
@@ -97,6 +94,15 @@ namespace detail{
             return const_iterator(func, store.storage.end());
         }
     };
+
+ // Helper metafunctions
+
+    template<typename T, typename Default>
+    struct get_storage_kind{
+        typedef typename T::storage_t type;
+    };
+
+
 
 }// detail namespace
 }// func namespace

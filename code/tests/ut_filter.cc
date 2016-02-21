@@ -61,29 +61,3 @@ TEST(Filter, std_function){
         std::vector<std::pair<const int, int>> res (x.begin(), x.end());
         EXPECT_EQ(res.size(), 1);
     }
-    
-//TEST(Filter, chain){
-//        // four steps chained.
-//        // - variable lambda
-//        // - inline lamba
-//        // - function type
-//        // - functor
-//        
-//        std::list<int> l = { 0,1,2,3,4,5};
-//        
-//        auto lambda1 = [](int a) -> int { return a+1; };
-//        std::function<int (int)> lambda2 = [](int a) -> int { return a+1; };
-//        struct Lambda3{
-//            int operator()(int a){
-//                return a+1;
-//            }
-//        } lambda3;
-//        
-//        auto x = func::transform(lambda1,
-//                                 func::transform([](int a){return a+1;},
-//                                                 func::transform(lambda2,
-//                                                                 func::transform(lambda3, l))));
-//      
-//        std::vector<int> res (x.begin(), x.end());
-//        EXPECT_THAT(res, ElementsAre(4,5,6,7,8,9));
-//    }

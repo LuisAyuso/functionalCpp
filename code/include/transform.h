@@ -25,6 +25,24 @@ namespace func{
         TransforIterator(Func& f, const Source s, const Source)
         :f(f), s(s) {}
         
+        TransforIterator(const TransforIterator& o)
+        : f(o.f), s(o.s)
+        {}
+
+        TransforIterator(TransforIterator&& o)
+        : f(o.f), s(std::move(o.s))
+        {}
+        
+        TransforIterator& operator= (const TransforIterator& o){
+            abort();
+            return *this;
+        }
+        
+        TransforIterator& operator= (TransforIterator&& o){
+            abort();
+            return *this;
+        }
+        
         template <typename A, typename B, typename F>
         TransforIterator(const TransforIterator<A,B,F>& o)
         :f(o.f), s(o.s){
@@ -61,12 +79,12 @@ namespace func{
         }
 
         self_type& operator++(){
-            s++;
+            ++s;
             return *this;
         }
         self_type operator++(int){
             self_type cpy= *this;
-            s++;
+            ++s;
             return cpy;
         }
     };
