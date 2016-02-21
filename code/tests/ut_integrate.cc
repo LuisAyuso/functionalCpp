@@ -149,6 +149,18 @@ TYPED_TEST(RandomAccessTest, std_cpy_func_nest){
     VALIDATE(output);
 }
 
+TYPED_TEST(RandomAccessTest, std_cpy_func_inline){
+
+    std::list<float> output;
+
+    auto x = func::transform([](unsigned x) -> float { return x+0.1; }, 
+             func::filter([](unsigned x) -> bool { return x%2; }, 
+             func::transform([](int x) -> unsigned { return x<0? -x: x; }, this->input)));
+
+    std::copy(x.begin(), x.end(), std::back_inserter(output));
+    EXPECT_EQ(output.size(), 6);
+    VALIDATE(output);
+}
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 template <typename T>
@@ -160,20 +172,32 @@ struct WithIterators : public testing::Test {
     virtual void SetUp(){
         
         mysetup(); 
-        std::copy(values, values+SIZE, std::back_inserter(input));
         EXPECT_EQ(input.size(), SIZE);
     }
 };
 
 template<>
 void WithIterators<std::list<int>>::mysetup(){
+    std::copy(values, values+SIZE, std::back_inserter(input));
 }
-
+template<>
+void WithIterators<std::vector<int>>::mysetup(){
+    std::copy(values, values+SIZE, std::back_inserter(input));
+}
+template<>
+void WithIterators<std::array<int,SIZE>>::mysetup(){
+        for (int i=0; i< SIZE; ++i) input[i] = values[i];
+}
+template<>
+void WithIterators<std::deque<int>>::mysetup(){
+    std::copy(values, values+SIZE, std::back_inserter(input));
+}
 template<typename T>
 void WithIterators<T>::mysetup(){
+        FAIL() << "not implemented";
 }
 
-typedef ::testing::Types<std::list<int>> NonRandAccessTypes;
+typedef ::testing::Types<std::list<int>, std::vector<int>, std::array<int,SIZE>, std::deque<int>> NonRandAccessTypes;
 
 TYPED_TEST_CASE(WithIterators, NonRandAccessTypes);
 
@@ -211,6 +235,19 @@ TYPED_TEST(WithIterators, std_cpy_func){
     auto x = func::transform(b,
              func::filter( filter,
              func::transform(a, this->input)));
+
+    std::copy(x.begin(), x.end(), std::back_inserter(output));
+    VALIDATE(output);
+}
+
+TYPED_TEST(WithIterators, std_cpy_func_inline){
+
+
+    std::list<float> output;
+
+    auto x = func::transform( [](unsigned x) -> float { return x+0.1; },
+             func::filter( [](unsigned x) -> bool { return x%2; },
+             func::transform( [](int x) -> unsigned { return x<0? -x: x; }, this->input)));
 
     std::copy(x.begin(), x.end(), std::back_inserter(output));
     VALIDATE(output);
