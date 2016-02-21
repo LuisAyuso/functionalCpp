@@ -1,7 +1,12 @@
 #include "gtest/gtest.h"
 
 #include <iterator>
+#include <vector>
+#include <list>
+#include <map>
+#include <array>
 
+#include "utils.h"
 
 template<typename T>
 class my_iter: public std::iterator<std::forward_iterator_tag, T>{
@@ -81,6 +86,53 @@ TEST (Iterators, concept){
 
     std::vector<int> v(array.begin(), array.end());
 
-    for( auto x :  v) 
+    for( auto x :  v)
         EXPECT_EQ(x , 11);
+}
+
+TEST (Iterators, random_access) {
+    std::vector<int> v = {1,2,3};
+    std::list<int> l = {1,2,3};
+    std::array<int,3> a = {1,2,3};
+    std::map<int,int> m = {{1,2},{2,3},{3,4}};
+
+    //Test if it is possible to identify some container as random iterable or not
+    EXPECT_TRUE(func::has_ra_iter<decltype(v)::iterator>::value);
+    EXPECT_TRUE((func::has_ra_iter<decltype(a)::iterator>::value));
+    EXPECT_FALSE(func::has_ra_iter<decltype(l)::iterator>::value);
+    EXPECT_FALSE((func::has_ra_iter<decltype(m)::iterator>::value));
+
+    //We can derive from is_ra_iterable<Container> metafunction in order to 
+    //automatically derive from different classes for random or non random iterable containers
+    //test vector
+    EXPECT_TRUE((std::is_base_of<std::iterator<std::bidirectional_iterator_tag, int>,
+                                 typename func::is_ra_iterable<int,decltype(v)::iterator>
+                                 >::value));
+    EXPECT_FALSE((std::is_base_of<std::iterator<std::input_iterator_tag, int>,
+                                 typename func::is_ra_iterable<int,decltype(v)::iterator>
+                                 >::value));
+    //test array
+    EXPECT_TRUE((std::is_base_of<std::iterator<std::bidirectional_iterator_tag, int>,
+                                 typename func::is_ra_iterable<int,decltype(a)::iterator>
+                                 >::value));
+    EXPECT_FALSE((std::is_base_of<std::iterator<std::input_iterator_tag, int>,
+                                 typename func::is_ra_iterable<int,decltype(a)::iterator>
+                                 >::value));
+
+    //list array
+    EXPECT_FALSE((std::is_base_of<std::iterator<std::bidirectional_iterator_tag, int>,
+                                 typename func::is_ra_iterable<int,decltype(l)::iterator>
+                                 >::value));
+    EXPECT_TRUE((std::is_base_of<std::iterator<std::input_iterator_tag, int>,
+                                 typename func::is_ra_iterable<int,decltype(l)::iterator>
+                                 >::value));
+
+    //map array
+    EXPECT_FALSE((std::is_base_of<std::iterator<std::bidirectional_iterator_tag, std::pair<int,int>>,
+                                 typename func::is_ra_iterable<std::pair<int,int>,decltype(m)::iterator>
+                                 >::value));
+    EXPECT_TRUE((std::is_base_of<std::iterator<std::input_iterator_tag, std::pair<int,int>>,
+                                 typename func::is_ra_iterable<std::pair<int,int>,decltype(m)::iterator>
+                                 >::value));
+
 }
