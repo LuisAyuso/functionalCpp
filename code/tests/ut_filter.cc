@@ -57,7 +57,8 @@ TEST(Filter, std_function){
         m[2] = 1;
         std::function< bool (std::pair<const int,int>)> f =[](std::pair<int, int> x) -> bool {return x.first == x.second;};
         auto x = func::filter(f,m);
-        
+    
+    
         std::vector<std::pair<const int, int>> res (x.begin(), x.end());
         EXPECT_EQ(res.size(), 1);
     }

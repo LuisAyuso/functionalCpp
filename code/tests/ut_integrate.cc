@@ -111,6 +111,7 @@ TYPED_TEST(RandomAccessTest, NestedLoops){
 
         output.push_back( b(x) );
     }
+    EXPECT_EQ(output.size(), 6);
     VALIDATE(output);
 }
 
@@ -126,22 +127,25 @@ TYPED_TEST(RandomAccessTest, std_cpy_func){
     auto y = func::filter( filter, x);
     auto z = func::transform(b, y);
 
-    for (auto i :  x){
-        std::cout << i << ", ";
-    }
-    std::cout << std::endl;
-    for (auto i :  y){
-        std::cout << i << ", ";
-    }
-    std::cout << std::endl;
+    std::copy(z.begin(), z.end(), std::back_inserter(output));
+    EXPECT_EQ(output.size(), 6);
+    VALIDATE(output);
+}
 
-    for (auto i :  z){
-        std::cout << i << ", ";
-    }
-    std::cout << std::endl;
+TYPED_TEST(RandomAccessTest, std_cpy_func_nest){
+
+    auto a = [](int x) -> unsigned { return x<0? -x: x; };
+    auto filter = [](unsigned x) -> bool { return x%2; };
+    auto b = [](unsigned x) -> float { return x+0.1; };
+
+    std::list<float> output;
+
+    auto x = func::transform(b, 
+             func::filter( filter, 
+             func::transform(a, this->input)));
 
     std::copy(x.begin(), x.end(), std::back_inserter(output));
-    ASSERT_EQ(output.size(), 6);
+    EXPECT_EQ(output.size(), 6);
     VALIDATE(output);
 }
 
@@ -157,7 +161,7 @@ struct WithIterators : public testing::Test {
         
         mysetup(); 
         std::copy(values, values+SIZE, std::back_inserter(input));
-        ASSERT_EQ(input.size(), SIZE);
+        EXPECT_EQ(input.size(), SIZE);
     }
 };
 
@@ -192,6 +196,7 @@ TYPED_TEST(WithIterators, NestedLoops){
 
         output.push_back( b(x) );
     }
+    EXPECT_EQ(output.size(), 6);
     VALIDATE(output);
 }
 

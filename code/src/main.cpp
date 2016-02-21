@@ -28,7 +28,7 @@ int main(int argc, const char * argv[]) {
     auto func = [](int i) { return i+1; };
     
     auto x = func::transform(func, func::filter( filter, l));
-    //std::vector<int> res (x.begin(), x.end());
+    std::vector<int> res (x.begin(), x.end());
     
     for (auto v : x) std::cout << v << ",";
     std::cout << std::endl;

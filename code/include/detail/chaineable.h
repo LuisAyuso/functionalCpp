@@ -49,25 +49,25 @@ namespace detail{
         chaineable_store_t(const chaineable_store_t&) = delete;
     };
     
-    template<typename N,                // container element type
-             typename R,                // output element type
+    template<
+             typename FuncType,          // type of the function
              typename C,                // container type
              typename Storage_type,     // kind of storage (reference or value)
              typename Iterator          // what kind of iterator this chaineable will provide
                  > 
     struct chaineable_t{
 
-        static_assert(validate_container_function<N, C>::value,
+        using elem_type =  typename get_lambda<FuncType,C>::param_type;
+        static_assert(validate_container_function<elem_type, C>::value,
                       "the function does not accept the collection type as paramenter");
-        
-        using value_type = R;
-        using function_type = std::function<R (N)>;
+       
+        using value_type =  typename get_lambda<FuncType,C>::return_type;
         using storage_t = detail::chaineable_store_t<C, Storage_type>;
 
-        function_type func;
+        FuncType func;
         storage_t store;
 
-        chaineable_t(function_type func, storage_t&& store) : func(func), store(std::move(store)) {}
+        chaineable_t(FuncType func, storage_t&& store) : func(func), store(std::move(store)) {}
         
         using iterator = Iterator;
         using const_iterator = const Iterator;

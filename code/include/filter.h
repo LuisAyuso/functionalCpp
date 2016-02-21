@@ -7,7 +7,6 @@
 //
 #pragma once
 #include <iterator>
-#include <functional>
 
 #include "utils.h"
 #include "detail/chaineable.h"
@@ -96,43 +95,43 @@ namespace func{
     };
     
     
-    template<typename N, typename C, typename Storage_type>
-        using filter_t = detail::chaineable_t<
-                                    N, bool, C, Storage_type,
-                                    FilterIterator<N, typename C::iterator, std::function<bool(N)>>
+
+    template <typename FuncType, typename C, typename Storage_type>
+    using filter_t = detail::chaineable_t<
+                            FuncType, C, Storage_type, // forward paramenters
+                            FilterIterator<typename C::value_type, typename C::iterator, FuncType > // specific iterator type for transformation
                                 >;
 
     // for function type
     // lvalue collection
-    template <typename N, typename R, typename C>
-    filter_t<N,C,detail::Reference_storage> filter(std::function<R (N)> f, C& c){
-        return filter_t<N,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
+    template <typename FuncType, typename C>
+    filter_t<FuncType,C,detail::Reference_storage> filter(FuncType f, C& c){
+        return filter_t<FuncType, C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
     }
 
     // for function type
     // rvalue collection
-    template <typename N, typename R, typename C>
-    filter_t<N,C,detail::Value_storage> filter(std::function<R (N)> f, C&& c){
-        return filter_t<N,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
+    template <typename FuncType, typename C>
+    filter_t<FuncType,C,detail::Value_storage> filter(FuncType f, C&& c){
+        return filter_t<FuncType,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
     }
 
-    // for lambda type
-    // lvalue collection
-    template <typename F, typename C>
-    filter_t<typename get_lambda<F,C>::param_type, C, detail::Reference_storage>
-    filter(F f, C& c){
-        using N = typename get_lambda<F,C>::param_type;
-        return filter_t<N,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
-    }
-
-    // for lambda type
-    // xvalue collection
-    template <typename F, typename C>
-    filter_t<typename get_lambda<F,C>::param_type, C, detail::Value_storage>
-    filter(F f, C&& c){
-        using N = typename get_lambda<F,C>::param_type;
-        return filter_t<N,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
-    }
+//    // for lambda type
+//    // lvalue collection
+//    template <typename FuncType, typename C>
+//    filter_t<FuncType, C, detail::Reference_storage>
+//    filter(FuncType f, C& c){
+//        return filter_t<FuncType,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
+//    }
+//
+//    // for lambda type
+//    // xvalue collection
+//    template <typename F, typename C>
+//    filter_t<typename get_lambda<F,C>::param_type, C, detail::Value_storage>
+//    filter(F f, C&& c){
+//        using N = typename get_lambda<F,C>::param_type;
+//        return filter_t<N,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
+//    }
 }
 
 
