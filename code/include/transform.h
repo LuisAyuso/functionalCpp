@@ -9,7 +9,7 @@
 #pragma once
 #include <iterator>
 
-#include "utils.h"
+#include "detail/utils.h"
 #include "detail/chaineable.h"
 
 namespace func{
@@ -93,7 +93,7 @@ namespace func{
    template <typename FuncType, typename C, typename Storage_type> 
     using transform_t = detail::chaineable_t<
                             FuncType, C, Storage_type, // forward paramenters
-                            TransforIterator<typename get_lambda<FuncType,C>::return_type, typename C::iterator, FuncType > // specific iterator type for transformation
+                            TransforIterator<typename detail::get_lambda<FuncType,C>::return_type, typename C::iterator, FuncType > // specific iterator type for transformation
                                 >;
 
 

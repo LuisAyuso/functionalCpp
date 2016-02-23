@@ -9,7 +9,7 @@
 #pragma once
 #include <iterator>
 
-#include "utils.h"
+#include "detail/utils.h"
 
 namespace func{
 namespace detail{
@@ -57,11 +57,11 @@ namespace detail{
                  > 
     struct chaineable_t{
 
-        using elem_type =  typename get_lambda<FuncType,C>::param_type;
+        using elem_type =  typename detail::get_lambda<FuncType,C>::param_type;
         static_assert(validate_container_function<elem_type, C>::value,
                       "the function does not accept the collection type as paramenter");
        
-        using value_type =  typename get_lambda<FuncType,C>::return_type;
+        using value_type =  typename detail::get_lambda<FuncType,C>::return_type;
         using storage_t = detail::chaineable_store_t<C, Storage_type>;
 
         FuncType func;
@@ -94,15 +94,6 @@ namespace detail{
             return const_iterator(func, store.storage.end());
         }
     };
-
- // Helper metafunctions
-
-    template<typename T, typename Default>
-    struct get_storage_kind{
-        typedef typename T::storage_t type;
-    };
-
-
 
 }// detail namespace
 }// func namespace

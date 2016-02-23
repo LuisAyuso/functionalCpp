@@ -6,14 +6,13 @@
 //  Copyright (c) 2015 Luis Ayuso. All rights reserved.
 //
 
-#ifndef functional_utils_h
-#define functional_utils_h
+#pragma once
 
-#include <map>
-#include <functional>
 #include <type_traits>
+#include <functional>
 
 namespace func {
+namespace detail {
 
     template <class T>
     struct remove_all {
@@ -142,7 +141,5 @@ namespace func {
 
     };
 
- } // end namespace
-
-
-#endif
+ } // end namespace detail
+ } // end namespace func

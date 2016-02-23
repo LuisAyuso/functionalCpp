@@ -8,7 +8,7 @@
 #pragma once
 #include <iterator>
 
-#include "utils.h"
+#include "detail/utils.h"
 #include "detail/chaineable.h"
 
 namespace func{

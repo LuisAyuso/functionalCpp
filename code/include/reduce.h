@@ -10,7 +10,7 @@
 #define functional_reduce_h
 
 #include <functional>
-#include "utils.h"
+#include "detail/utils.h"
 
 namespace func{
     
