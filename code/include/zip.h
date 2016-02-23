@@ -43,7 +43,7 @@ namespace func{
             }
             template <typename... Args>
             static Iter get_end(T& tuple, Args... storages) {
-                return aux<Iter,T,N-1>::get_begin(tuple, std::get<N-1>(tuple).end(), storages...);
+                return aux<Iter,T,N-1>::get_end(tuple, std::get<N-1>(tuple).end(), storages...);
             }
         };
 
@@ -82,6 +82,21 @@ namespace func{
             }
         };
 
+        /*************COMPARE TUPLE***************/
+        template <typename T, unsigned N = std::tuple_size<T>::value-1>
+        struct cmp {
+            static bool apply(const T& a, const T& b) {
+                return cmp<T,N-1>::apply(a, b) && std::get<N>(a) == std::get<N>(b);
+            }
+        };
+
+        template <typename T>
+        struct cmp<T,0> {
+            static bool apply(const T& a, const T& b) {
+                return std::get<0>(a) == std::get<0>(b);
+            }
+        };
+
     }
 
     // iterator
@@ -99,11 +114,11 @@ namespace func{
         ZipIterator& operator=(ZipIterator&& s) = delete;
 
         bool operator== (const ZipIterator& o) const {
-            return source == o.source;
+            return cmp<inner_type>::apply(source, o.source);
         }
 
         bool operator!= (const ZipIterator& o) const {
-            return source != o.source;
+            return !cmp<inner_type>::apply(source, o.source);
         }
 
         ZipIterator operator++() {
@@ -136,12 +151,12 @@ namespace func{
     struct zip_t {
         // tuple of given container value types
         using value_type = get_value_type_t<typename Args::value_type...>;
-        std::tuple<Args...> storage;
+        std::tuple<Args&...> storage;
 
         using inner_iterator_type = get_value_type_t<typename Args::iterator...>;
         using iterator = ZipIterator<inner_iterator_type, value_type>;
 
-        zip_t(Args... containers) : storage(containers...) { }
+        zip_t(Args&... containers) : storage(containers...) { }
 
         iterator begin() {
             return aux<iterator, decltype(storage), sizeof...(Args)>::get_begin(this->storage);

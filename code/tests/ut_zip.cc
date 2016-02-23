@@ -21,26 +21,27 @@ TEST(Zip, traits){
 }
 
 TEST(Zip, iterator){
-    std::vector<int> a = {1,2,3,4};
+    std::vector<int>   a = {1,2,3,4};
     std::vector<float> b = {.1,.2,.3,.4};
 
-    auto y = func::zip_t<std::vector<int>,std::vector<float>>(a,b);
-    auto z = y.begin();
-    auto zz = y.end();
-    EXPECT_EQ(std::get<0>(z.source), a.begin());
-    EXPECT_EQ(std::get<1>(z.source), b.begin());
-    EXPECT_EQ(std::get<0>(zz.source), a.end());
-    EXPECT_EQ(std::get<1>(zz.source), b.end());
+    auto y   = func::zip_t<std::vector<int>,std::vector<float>>(a,b);
+    auto it  = y.begin();
+    auto end = y.end();
 
-    EXPECT_EQ(z.source, std::make_pair(a.begin(), b.begin()));
+    EXPECT_EQ (std::get<0>(it.source),  a.begin());
+    EXPECT_EQ (std::get<1>(it.source),  b.begin());
+    EXPECT_NE (std::get<0>(end.source), a.begin());
+    EXPECT_NE (std::get<1>(end.source), b.begin());
+    EXPECT_EQ (std::get<0>(end.source), a.end());
+    EXPECT_EQ (std::get<1>(end.source), b.end());
 
-    EXPECT_EQ(*(std::get<0>(z.source)), 1);
-    EXPECT_FLOAT_EQ(*(std::get<1>(z.source)), 0.1);
+    EXPECT_EQ       (it.source, std::make_pair(a.begin(), b.begin()));
+    EXPECT_EQ       (*(std::get<0>(it.source)), 1);
+    EXPECT_FLOAT_EQ (*(std::get<1>(it.source)), 0.1);
 
-    ++z;
-    EXPECT_EQ(*(std::get<0>(z.source)), 2);
-    EXPECT_FLOAT_EQ(*(std::get<1>(z.source)), 0.2);
-
+    ++it;
+    EXPECT_EQ       (*(std::get<0>(it.source)), 2);
+    EXPECT_FLOAT_EQ (*(std::get<1>(it.source)), 0.2);
 }
 
 TEST(Zip, iterator1){
@@ -54,16 +55,14 @@ TEST(Zip, iterator1){
 
     std::vector<std::pair<int,float>> lp;
     std::copy(y.begin(), y.end(), std::back_inserter(lp));
+
     EXPECT_EQ(lp[0].first, 1);
-    EXPECT_EQ(lp[0].second, 0.1);
     EXPECT_EQ(lp[1].first, 2);
-    EXPECT_EQ(lp[1].second, 0.2);
     EXPECT_EQ(lp[2].first, 3);
-    EXPECT_EQ(lp[2].second, 0.3);
     EXPECT_EQ(lp[3].first, 4);
-    EXPECT_EQ(lp[3].second, 0.4);
 
+    EXPECT_FLOAT_EQ(lp[0].second, 0.1);
+    EXPECT_FLOAT_EQ(lp[1].second, 0.2);
+    EXPECT_FLOAT_EQ(lp[2].second, 0.3);
+    EXPECT_FLOAT_EQ(lp[3].second, 0.4);
 }
-
-
-
