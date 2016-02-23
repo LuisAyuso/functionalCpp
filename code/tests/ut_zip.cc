@@ -15,9 +15,16 @@
 using namespace testing;
 
 TEST(Zip, traits){
+
     EXPECT_TRUE((std::is_same<int, func::zip_t<std::vector<int>>::value_type>::value));
     EXPECT_TRUE((std::is_same<std::pair<int,float>, func::zip_t<std::vector<int>, std::vector<float>>::value_type>()));
     EXPECT_TRUE((std::is_same<std::tuple<int,float,double>, func::zip_t<std::vector<int>, std::vector<float>, std::vector<double>>::value_type>()));
+
+    EXPECT_TRUE((std::is_same<std::tuple<int,float,double>, func::zip_t<std::vector<int>, std::list<float>, std::vector<double>>::value_type>()));
+    EXPECT_TRUE((std::is_same<std::tuple<int,float,double>, func::zip_t<std::array<int,90>, std::list<float>, std::vector<double>>::value_type>()));
+
+    EXPECT_TRUE((std::is_same<std::tuple<int,float,double>, func::zip_t<std::vector<int>, std::vector<float>, std::list<double>>::value_type>()));
+    EXPECT_TRUE((std::is_same<std::tuple<int,float,double>, func::zip_t<std::vector<int>, std::vector<float>, std::array<double,10>>::value_type>()));
 }
 
 TEST(Zip, iterator){
@@ -44,7 +51,7 @@ TEST(Zip, iterator){
     EXPECT_FLOAT_EQ (*(std::get<1>(it.source)), 0.2);
 }
 
-TEST(Zip, iterator1){
+TEST(Zip, two){
     std::vector<int> a = {1,2,3,4};
     std::vector<float> b = {.1,.2,.3,.4};
 
@@ -65,4 +72,33 @@ TEST(Zip, iterator1){
     EXPECT_FLOAT_EQ(lp[1].second, 0.2);
     EXPECT_FLOAT_EQ(lp[2].second, 0.3);
     EXPECT_FLOAT_EQ(lp[3].second, 0.4);
+}
+
+TEST(Zip, three){
+    std::vector<int> a = {1,2,3,4};
+    std::vector<float> b = {.1,.2,.3,.4};
+    std::list<double> c = {.1,.2,.3,.4};
+
+    auto x = func::zip_t<std::vector<int>,std::vector<float>, std::list<double>>(a,b,c);
+
+    EXPECT_TRUE((std::is_same<std::tuple<int,float,double>, decltype(x)::value_type>()));
+
+    std::vector<std::tuple<int,float,double>> lp;
+    std::copy(x.begin(), x.end(), std::back_inserter(lp));
+
+
+    EXPECT_EQ( (std::get<0>(lp[0])), 1);
+    EXPECT_EQ( (std::get<0>(lp[1])), 2);
+    EXPECT_EQ( (std::get<0>(lp[2])), 3);
+    EXPECT_EQ( (std::get<0>(lp[3])), 4);
+
+//    EXPECT_FLOAT_EQ( (std::get<1>(lp[0])), 0.1);
+//    EXPECT_FLOAT_EQ( (std::get<1>(lp[1])), 0.2);
+//    EXPECT_FLOAT_EQ( (std::get<1>(lp[2])), 0.3);
+//    EXPECT_FLOAT_EQ( (std::get<1>(lp[3])), 0.4);
+//
+//    EXPECT_FLOAT_EQ( (std::get<2>(lp[0])), 0.1);
+//    EXPECT_FLOAT_EQ( (std::get<2>(lp[1])), 0.2);
+//    EXPECT_FLOAT_EQ( (std::get<2>(lp[2])), 0.3);
+//    EXPECT_FLOAT_EQ( (std::get<2>(lp[3])), 0.4);
 }

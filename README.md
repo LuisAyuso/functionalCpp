@@ -15,6 +15,8 @@ is an attempt to implement chainable user defined operations for C++.
     Transform each element of a collection, the result has the same arity, but might have different element type.
 ###Filter:          
     Filter elements based on custom criteria, the arity of the resulting collection can be 0 to the original size.
+###Zip:          
+    Merge N collections into a collection of agregates. If two collections, produces pairs, if more, produces tuples
 ###Reduce: 
     Reduce, compute some scalar value based on all elements in collection
 
