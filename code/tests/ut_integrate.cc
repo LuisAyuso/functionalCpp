@@ -16,6 +16,7 @@
 
 #include "transform.h"
 #include "filter.h"
+#include "zip.h"
 #include "reduce.h"
 
 
@@ -251,4 +252,20 @@ TYPED_TEST(WithIterators, std_cpy_func_inline){
 
     std::copy(x.begin(), x.end(), std::back_inserter(output));
     VALIDATE(output);
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TEST(all, together){
+
+    std::vector<int> input1 (100);
+    std::list<char> input2(input1.begin(), input1.end());
+
+    auto x = func::zip( input2, 
+            func::transform( [](unsigned x) -> float { return x+0.1; },
+             func::filter( [](unsigned x) -> bool { return x%2; },
+             func::transform( [](int x) -> unsigned { return x<0? -x: x; }, input1))));
+
+    std::vector<std::pair<char, int>> output;
+    std::copy(x.begin(), x.end(), std::back_inserter(output));
 }

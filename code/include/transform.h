@@ -34,12 +34,12 @@ namespace func{
         {}
         
         TransforIterator& operator= (const TransforIterator& o){
-            abort();
+            s = o.s;
             return *this;
         }
         
         TransforIterator& operator= (TransforIterator&& o){
-            abort();
+            std::swap(s, o.s);
             return *this;
         }
         
@@ -58,14 +58,14 @@ namespace func{
         }
         
         template <typename A, typename B, typename F>
-        bool operator == (const TransforIterator<A,B,F>& o){
+        bool operator == (const TransforIterator<A,B,F>& o) const{
             static_assert(std::is_same<A, Value>::value,  "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
             return this->s == o.s;
         }
         
         template <typename A, typename B, typename F>
-        bool operator != (const TransforIterator<A,B,F>& o){
+        bool operator != (const TransforIterator<A,B,F>& o) const{
             static_assert(std::is_same<A, Value>::value,  "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
             return s != o.s;

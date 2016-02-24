@@ -24,6 +24,7 @@ namespace detail{
     template<typename C>
     struct chaineable_store_t<C,Reference_storage>{
 
+        using stored_type = C;
         C& storage;
 
         chaineable_store_t(C& c)
@@ -33,11 +34,15 @@ namespace detail{
         :storage(t.storage) {}
 
         chaineable_store_t(const chaineable_store_t&) = delete;
+
+        C& operator* (){ return storage; }
+        C* operator-> (){ return &storage; }
     };
 
     template<typename C>
     struct chaineable_store_t<C,Value_storage>{
 
+        using stored_type = C;
         C storage;
 
         chaineable_store_t(C&& c)
@@ -47,6 +52,9 @@ namespace detail{
         :storage(std::move(t.storage)) {}
 
         chaineable_store_t(const chaineable_store_t&) = delete;
+
+        C& operator* (){ return storage; }
+        C* operator-> (){ return &storage; }
     };
     
     template<
@@ -94,6 +102,23 @@ namespace detail{
             return const_iterator(func, store.storage.end());
         }
     };
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    template <typename T>
+    using ref_t =  chaineable_store_t<T, Reference_storage>;
+    template <typename T>
+    using val_t =  chaineable_store_t<T, Value_storage>;
+    
+//    template<typename T>
+//    ref_t<T> ref(T& t){
+//        return ref_t<T>(t);
+//    }
+//    template<typename T>
+//    val_t<T> val(T&& t){
+//        return val_t<T>(std::move(t));
+//    }
+
 
 }// detail namespace
 }// func namespace
