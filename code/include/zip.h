@@ -141,7 +141,7 @@ namespace func{
 
         bool operator!= (const ZipIterator& o) const {
            // return !cmp<inner_type>::apply(source, o.source);
-           return source != o.source;
+           return !(source == o.source);
         }
 
         ZipIterator operator++() {
@@ -156,12 +156,6 @@ namespace func{
         }
 
         value_type operator*() {
-            value_type vals;
-            trf<inner_type, value_type, std::tuple_size<inner_type>::value-1>::apply_ind(source, vals);
-            return vals;
-        }
-
-        value_type operator->() {
             value_type vals;
             trf<inner_type, value_type, std::tuple_size<inner_type>::value-1>::apply_ind(source, vals);
             return vals;

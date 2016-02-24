@@ -25,8 +25,10 @@ namespace func{
         FilterIterator(Func& f, const Source beg, const Source end)
         :f(f), s(beg), end(end) {
             while(s != end && !f(*s)){
+                std::cout << "+";
                 ++s;
             }
+            std::cout << std::endl;
         }
 
         FilterIterator(const FilterIterator& o)
@@ -80,16 +82,22 @@ namespace func{
         }
         
         self_type& operator++(){
+            if(s == end) return *this;
             do{
+                std::cout << "+";
                 ++s;
             }while(s != end && !f(*s));
+                std::cout <<  std::endl;
             return *this;
         }
         self_type operator++(int){
+            if(s == end) return *this;
             self_type cpy= *this;
             do{
+                std::cout << "+";
                 ++s;
             }while(s != end && !f(*s));
+                std::cout <<  std::endl;
             return cpy;
         }
     };

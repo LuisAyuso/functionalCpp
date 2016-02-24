@@ -256,10 +256,30 @@ TYPED_TEST(WithIterators, std_cpy_func_inline){
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+TEST(all, together_small){
+
+    std::vector<int> input1 {1,2,3,4,5,6};
+    std::list<unsigned> input2(input1.begin(), input1.end());
+
+    auto x = func::zip( input2, 
+            func::transform( [](unsigned x) -> float { return x+0.1; },
+             func::filter( [](unsigned x) -> bool { return x%2; },
+             func::transform( [](int x) -> unsigned { return x<0? -x: x; }, input1))));
+
+
+    auto it = x.begin();
+    for(int i =0; i < 3; ++i){
+        EXPECT_EQ ((*it).first, input1[i]);
+        std::cout << (*it).second << std::endl;
+        ++it;
+    }
+    EXPECT_EQ(it, x.end());
+}
+
 TEST(all, together){
 
     std::vector<int> input1 (100);
-    std::list<char> input2(input1.begin(), input1.end());
+    std::list<unsigned> input2(input1.begin(), input1.end());
 
     auto x = func::zip( input2, 
             func::transform( [](unsigned x) -> float { return x+0.1; },
@@ -268,4 +288,6 @@ TEST(all, together){
 
     std::vector<std::pair<char, int>> output;
     std::copy(x.begin(), x.end(), std::back_inserter(output));
+
+    EXPECT_EQ(output.size(), 0);
 }

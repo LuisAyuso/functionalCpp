@@ -70,6 +70,8 @@ TEST(Zip, capture_value){
 
     auto x = func::zip(vec_int(100),a);
     EXPECT_TRUE((std::is_same< std::pair<int, int>, decltype(x)::value_type>() ));
+    EXPECT_EQ(std::get<1>(x.begin().source), a.begin());
+    EXPECT_EQ(std::get<1>(x.end().source), a.end());
 
     auto y = func::zip(a,vec_float(19));
     EXPECT_TRUE((std::is_same< std::pair<int, float>, decltype(y)::value_type>() ));
@@ -110,8 +112,14 @@ TEST(Zip, two){
 
     auto x = func::zip(a,b);
     const auto& z = x.begin();
+    const auto& end = x.end();
     EXPECT_EQ(*(std::get<0>(z.source)), *a.begin());
+    EXPECT_EQ(std::get<0>(z.source), a.begin());
     EXPECT_EQ(*(std::get<1>(z.source)), *b.begin());
+    EXPECT_EQ(std::get<1>(z.source), b.begin());
+
+    EXPECT_EQ(std::get<0>(end.source), a.end());
+    EXPECT_EQ(std::get<1>(end.source), b.end());
 
     std::vector<std::pair<int,float>> lp;
     std::copy(x.begin(), x.end(), std::back_inserter(lp));

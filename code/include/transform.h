@@ -74,9 +74,6 @@ namespace func{
         Value operator* (){
             return f(*s);
         }
-        Value operator->(){
-            return f(*s);
-        }
 
         self_type& operator++(){
             ++s;
