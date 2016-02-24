@@ -144,15 +144,15 @@ namespace func{
            return !(source == o.source);
         }
 
-        ZipIterator operator++() {
+        ZipIterator& operator++() {
+            trf<inner_type, inner_type, std::tuple_size<inner_type>::value-1>::apply_pp(source, source);
+            return *this;
+        }
+
+        ZipIterator operator++(int) {
             ZipIterator cpy = *this;
             trf<inner_type, inner_type, std::tuple_size<inner_type>::value-1>::apply_pp(source, source);
             return cpy;
-        }
-
-        ZipIterator& operator++(int) {
-            trf<inner_type, inner_type, std::tuple_size<inner_type>::value-1>::apply_pp(source, source);
-            return *this;
         }
 
         value_type operator*() {
