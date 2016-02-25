@@ -1,7 +1,7 @@
 /** 
-	FunctionalCpp,  A header only libray for chaineable functional operations 
+	FunctionalCpp,  A header only library for chainable functional operations 
 	in C++ collections
-    Copyright (C) 2016 Luis F. Ayuso
+    Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
