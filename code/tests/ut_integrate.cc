@@ -297,6 +297,7 @@ TEST(all, together_small){
 TEST(all, together){
 
     std::vector<int> input1 (100);
+    for(auto& v : input1) v = 0;
     std::list<unsigned> input2(input1.begin(), input1.end());
 
     auto x = func::zip( input2, 
@@ -304,8 +305,12 @@ TEST(all, together){
              func::filter( [](unsigned x) -> bool { return x%2; },
              func::transform( [](int x) -> unsigned { return x<0? -x: x; }, input1))));
 
-    std::vector<std::pair<char, int>> output;
+    ASSERT_EQ(x.begin(), x.end());
+
+    std::vector<std::pair<int, float>> output;
     std::copy(x.begin(), x.end(), std::back_inserter(output));
 
     EXPECT_EQ(output.size(), 0);
+
+    std::cout << output[0].first << "," << output[0].second << std::endl;
 }

@@ -66,24 +66,24 @@ namespace func{
         template <typename Iter, typename T, unsigned N>
         struct aux {
             template <typename... Args>
-            static Iter get_begin(T& tuple, Args... storages) {
-                return aux<Iter,T,N-1>::get_begin(tuple, std::get<N-1>(tuple)->begin(), storages...);
+            static Iter get_begin(T& tuple, Args&... storages) {
+                return aux<Iter,T,N-1>::get_begin(tuple, std::get<N-1>(tuple), storages...);
             }
             template <typename... Args>
-            static Iter get_end(T& tuple, Args... storages) {
-                return aux<Iter,T,N-1>::get_end(tuple, std::get<N-1>(tuple)->end(), storages...);
+            static Iter get_end(T& tuple, Args&... storages) {
+                return aux<Iter,T,N-1>::get_end(tuple, std::get<N-1>(tuple), storages...);
             }
         };
 
         template <typename Iter, typename T>
         struct aux<Iter,T,0> {
             template <typename... Args>
-            static Iter get_begin(T& tuple, Args... storages) {
-                return Iter(typename Iter::inner_type(storages...));
+            static Iter get_begin(T& tuple, Args&... storages) {
+                return Iter(typename Iter::inner_type(storages->begin()...), typename Iter::inner_type(storages->end()...));
             }
             template <typename... Args>
-            static Iter get_end(T& tuple, Args... storages) {
-                return Iter(typename Iter::inner_type(storages...));
+            static Iter get_end(T& tuple, Args&... storages) {
+                return Iter(typename Iter::inner_type(storages->end()...), typename Iter::inner_type(storages->end()...));
             }
         };
 
@@ -110,65 +110,86 @@ namespace func{
             }
         };
 
-        /*************COMPARE TUPLE***************/
-        template <typename T, unsigned N = std::tuple_size<T>::value-1>
-        struct cmp {
-            static bool apply(const T& a, const T& b) {
-                return cmp<T,N-1>::apply(a, b) && std::get<N>(a) == std::get<N>(b);
+        template <typename T>
+        void plusplus (T& source, T& target){
+            trf<T, T, std::tuple_size<T>::value-1>::apply_pp(source, target);
+        }
+        template <typename T, typename V>
+        void asterisk (T& source, V& target){
+            trf<T, V, std::tuple_size<T>::value-1>::apply_ind(source, target);
+        }
+
+        /**************** Check if tuple reaches end ******************/
+
+        template <typename T, unsigned  N>
+        struct check{
+            static bool eq (const T& begin, const T& end){
+                return std::get<N>(begin) == std::get<N>(end) || check<T, N-1>::eq(begin, end);
+            }
+        };
+        template <typename T>
+        struct check<T, 0>{
+            static bool eq (const T& begin, const T& end){
+                return std::get<0>(begin) == std::get<0>(end);
             }
         };
 
         template <typename T>
-        struct cmp<T,0> {
-            static bool apply(const T& a, const T& b) {
-                return std::get<0>(a) == std::get<0>(b);
-            }
-        };
-
+        bool is_end(const T& begin, const T& end){
+            return check<T, std::tuple_size<T>::value -1>::eq(begin, end);
+        }
     }
 
     // iterator
     template <typename T, typename Value>
     struct ZipIterator : public std::iterator<std::input_iterator_tag, Value> {
-        T source;
+        T source, end;
+        bool finish;
         using inner_type = T;
         using value_type = Value;
 
-        ZipIterator(const T& s) : source(s) { }
-        ZipIterator(T&& s) : source(std::move(s)) { }
-        ZipIterator(ZipIterator&& o) : source(std::move(o.source)) { }
-        ZipIterator(const ZipIterator& o) : source(o.source) { }
+        ZipIterator(): finish(true) {}
+        ZipIterator(const T& source, const T& end) : source(source), end(end), finish(source==end) { }
+
+        ZipIterator(const ZipIterator& o) : source(o.source), end(o.end), finish(o.finish) { }
+        ZipIterator(ZipIterator&& o) : source(std::move(o.source)), end(std::move(o.end)), finish(o.finish) { }
+
         ZipIterator& operator=(const ZipIterator& o){
             source = o.source;
+            end = o.end;
+            finish = o.finish;
         };
         ZipIterator& operator=(ZipIterator&& o) {
             std::swap(source, o.source);
+            std::swap(end, o.end);
+            finish = o.finish;
         }
 
         bool operator== (const ZipIterator& o) const {
-           // return cmp<inner_type>::apply(source, o.source);
-           return source == o.source;
+           return finish == o.finish || source == o.source;
         }
 
         bool operator!= (const ZipIterator& o) const {
-           // return !cmp<inner_type>::apply(source, o.source);
-           return !(source == o.source);
+           return !(*this == o);
         }
 
         ZipIterator& operator++() {
-            trf<inner_type, inner_type, std::tuple_size<inner_type>::value-1>::apply_pp(source, source);
+            plusplus(source, source);
+            finish = is_end(source, end);
             return *this;
         }
 
         ZipIterator operator++(int) {
             ZipIterator cpy = *this;
-            trf<inner_type, inner_type, std::tuple_size<inner_type>::value-1>::apply_pp(source, source);
+            plusplus(source, source);
+            finish = is_end(source, end);
             return cpy;
         }
 
         value_type operator*() {
+            assert(!finish && "can not deref end iterator");
             value_type vals;
-            trf<inner_type, value_type, std::tuple_size<inner_type>::value-1>::apply_ind(source, vals);
+            asterisk(source, vals);
             return vals;
         }
     };

@@ -18,6 +18,7 @@
 */
 #pragma once
 #include <iterator>
+#include <cassert>
 
 #include "detail/utils.h"
 #include "detail/chaineable.h"
@@ -36,10 +37,8 @@ namespace func{
         FilterIterator(Func& f, const Source beg, const Source end)
         :f(f), s(beg), end(end) {
             while(s != end && !f(*s)){
-                std::cout << "+";
                 ++s;
             }
-            std::cout << std::endl;
         }
 
         FilterIterator(const FilterIterator& o)
@@ -86,29 +85,23 @@ namespace func{
         }
         
         Value operator* (){
-            return *s;
-        }
-        Value operator->(){
+            assert(s != end && "deref and end iterator");
             return *s;
         }
         
         self_type& operator++(){
-            if(s == end) return *this;
+            assert(s != end && "move and end iterator");
             do{
-                std::cout << "+";
                 ++s;
             }while(s != end && !f(*s));
-                std::cout <<  std::endl;
             return *this;
         }
         self_type operator++(int){
-            if(s == end) return *this;
+            assert(s != end && "move and end iterator");
             self_type cpy= *this;
             do{
-                std::cout << "+";
                 ++s;
             }while(s != end && !f(*s));
-                std::cout <<  std::endl;
             return cpy;
         }
     };

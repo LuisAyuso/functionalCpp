@@ -152,6 +152,22 @@ TEST(Zip, two){
     EXPECT_FLOAT_EQ(lp[2].second, 0.3);
     EXPECT_FLOAT_EQ(lp[3].second, 0.4);
 }
+
+
+TEST(Zip, diff_size){
+    std::vector<int> a = {1,4};
+    std::vector<float> b = {.1,.2,.3,.4};
+
+    auto x = func::zip(a,b);
+    const auto& z = x.begin();
+    const auto& end = x.end();
+
+    std::vector<std::pair<int,float>> lp;
+    std::copy(x.begin(), x.end(), std::back_inserter(lp));
+
+    EXPECT_EQ(lp.size(), 2);
+}
+
 /*
 TEST(Zip, three){
     std::vector<int> a = {1,2,3,4};
