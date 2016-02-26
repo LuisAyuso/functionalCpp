@@ -223,19 +223,19 @@ namespace func{
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     template <typename T>
-    constexpr detail::val_t<T> getStorage(T&& v) {
+    constexpr detail::val_t<T> get_storage(T&& v) {
         return detail::val_t<T>(std::move(v));
     }
 
     template <typename T>
-    constexpr detail::ref_t<T> getStorage(T& v) {
+    constexpr detail::ref_t<T> get_storage(T& v) {
         return detail::ref_t<T>(v);
     }
 
     template <typename... Args>
     zip_t<detail::choose_storage_t<func::detail::get_reference_t<Args>>...> zip (Args&&... a) {
         using namespace func::detail;
-        return zip_t<detail::choose_storage_t<get_reference_t<Args>>...> (getStorage(a)...);
+        return zip_t<detail::choose_storage_t<get_reference_t<Args>>...> (get_storage(std::forward<Args>(a))...);
     }
 
 }

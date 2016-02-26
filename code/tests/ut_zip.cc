@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -75,7 +75,7 @@ TEST(Zip, helper){
     auto z = func::zip(d,c);
     EXPECT_TRUE((std::is_same< std::pair<std::string, char>, decltype(z)::value_type>() ));
 }
-    
+
 TEST(Zip, capture_value){
 
     using namespace func;
@@ -97,7 +97,6 @@ TEST(Zip, capture_value){
     auto z = func::zip(vec_string(50),vec_float(19));
     EXPECT_TRUE((std::is_same< std::pair<std::string, float>, decltype(z)::value_type>() ));
 }
-
 
 TEST(Zip, iterator){
     std::vector<int>   a = {1,2,3,4};
@@ -153,7 +152,6 @@ TEST(Zip, two){
     EXPECT_FLOAT_EQ(lp[3].second, 0.4);
 }
 
-
 TEST(Zip, diff_size){
     std::vector<int> a = {1,4};
     std::vector<float> b = {.1,.2,.3,.4};
@@ -169,9 +167,7 @@ TEST(Zip, diff_size){
 }
 
 TEST(Zip, empty){
-
     // test the traits
-
 
     // test the struct
     std::vector<int> a;
@@ -188,37 +184,7 @@ TEST(Zip, empty){
     EXPECT_EQ(lp.size(), 0);
 }
 
-/*
 TEST(Zip, three){
-    std::vector<int> a = {1,2,3,4};
-    std::vector<float> b = {.1,.2,.3,.4};
-    std::list<double> c = {.1,.2,.3,.4};
-
-    auto x = func::zip_t<std::vector<int>,std::vector<float>, std::list<double>>(a,b,c);
-
-    EXPECT_TRUE((std::is_same<std::tuple<int,float,double>, decltype(x)::value_type>()));
-
-    std::vector<std::tuple<int,float,double>> lp;
-    std::copy(x.begin(), x.end(), std::back_inserter(lp));
-
-
-    EXPECT_EQ( (std::get<0>(lp[0])), 1);
-    EXPECT_EQ( (std::get<0>(lp[1])), 2);
-    EXPECT_EQ( (std::get<0>(lp[2])), 3);
-    EXPECT_EQ( (std::get<0>(lp[3])), 4);
-
-    EXPECT_FLOAT_EQ( (std::get<1>(lp[0])), 0.1);
-    EXPECT_FLOAT_EQ( (std::get<1>(lp[1])), 0.2);
-    EXPECT_FLOAT_EQ( (std::get<1>(lp[2])), 0.3);
-    EXPECT_FLOAT_EQ( (std::get<1>(lp[3])), 0.4);
-
-    EXPECT_FLOAT_EQ( (std::get<2>(lp[0])), 0.1);
-    EXPECT_FLOAT_EQ( (std::get<2>(lp[1])), 0.2);
-    EXPECT_FLOAT_EQ( (std::get<2>(lp[2])), 0.3);
-    EXPECT_FLOAT_EQ( (std::get<2>(lp[3])), 0.4);
-}
-
-TEST(Zip, helper_func){
     std::vector<int> a = {1,2,3,4};
     std::vector<float> b = {.1,.2,.3,.4};
     std::list<double> c = {.1,.2,.3,.4};
@@ -246,4 +212,44 @@ TEST(Zip, helper_func){
     EXPECT_FLOAT_EQ( (std::get<2>(lp[2])), 0.3);
     EXPECT_FLOAT_EQ( (std::get<2>(lp[3])), 0.4);
 }
-*/
+
+TEST(Zip, pass_by_x){
+    std::vector<int> a = {1,2,3,4};
+    std::vector<int>& b = a;
+
+    auto x = func::zip(a,b,std::list<double>({.1,.2,.3,.4})); //call zip with val, ref, rvalref
+
+    EXPECT_TRUE((std::is_same<std::tuple<int,int,double>, decltype(x)::value_type>()));
+
+    std::vector<std::tuple<int,int,double>> lp;
+    std::copy(x.begin(), x.end(), std::back_inserter(lp));
+
+    EXPECT_EQ( (std::get<0>(lp[0])), 1);
+    EXPECT_EQ( (std::get<0>(lp[1])), 2);
+    EXPECT_EQ( (std::get<0>(lp[2])), 3);
+    EXPECT_EQ( (std::get<0>(lp[3])), 4);
+
+    EXPECT_EQ( (std::get<1>(lp[0])), 1);
+    EXPECT_EQ( (std::get<1>(lp[1])), 2);
+    EXPECT_EQ( (std::get<1>(lp[2])), 3);
+    EXPECT_EQ( (std::get<1>(lp[3])), 4);
+
+    EXPECT_FLOAT_EQ( (std::get<2>(lp[0])), 0.1);
+    EXPECT_FLOAT_EQ( (std::get<2>(lp[1])), 0.2);
+    EXPECT_FLOAT_EQ( (std::get<2>(lp[2])), 0.3);
+    EXPECT_FLOAT_EQ( (std::get<2>(lp[3])), 0.4);
+
+    auto it  = x.begin();
+    EXPECT_EQ       (*(std::get<0>(it.source)), 1);
+    EXPECT_FLOAT_EQ (*(std::get<2>(it.source)), 0.1);
+    ++it;
+    EXPECT_EQ       (*(std::get<0>(it.source)), 2);
+    EXPECT_FLOAT_EQ (*(std::get<2>(it.source)), 0.2);
+    ++it;
+    EXPECT_EQ       (*(std::get<0>(it.source)), 3);
+    EXPECT_FLOAT_EQ (*(std::get<2>(it.source)), 0.3);
+    ++it;
+    EXPECT_EQ       (*(std::get<0>(it.source)), 4);
+    EXPECT_FLOAT_EQ (*(std::get<2>(it.source)), 0.4);
+}
+

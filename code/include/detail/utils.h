@@ -154,7 +154,7 @@ namespace detail {
     //get reference in case the input is a non-ref. If it is a already a ref don't modify
     template <typename R>
     struct get_reference {
-        using type = R&;
+        using type = R&&;
     };
 
     template <typename R>
