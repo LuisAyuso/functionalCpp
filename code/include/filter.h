@@ -31,6 +31,7 @@ namespace func{
         Func& f;
         Source s;
         Source end;
+        bool finish;
         
         using self_type = FilterIterator<Value, Source, Func>;
         
@@ -39,49 +40,41 @@ namespace func{
             while(s != end && !f(*s)){
                 ++s;
             }
+            finish = end == s;
         }
 
         FilterIterator(const FilterIterator& o)
-          : f(o.f), s(o.s), end(o.end) { }
+          : f(o.f), s(o.s), end(o.end), finish(o.finish){ }
 
         FilterIterator(FilterIterator&& o)
-          : f(o.f), s(std::move(o.s)), end(std::move(o.end)) { }
+          : f(o.f), s(std::move(o.s)), end(std::move(o.end)), finish(o.finish) { }
 
         FilterIterator& operator= (const FilterIterator& o){
             s = o.s;
+            end = o.end;
+            finish = o.finish;
             return *this;
         }
         FilterIterator& operator= (FilterIterator&& o){
             std::swap(s, o.s);
+            std::swap(end, o.end);
+            finish = o.finish;
             return *this;
-        }
-        
-        template <typename A, typename B, typename F>
-        FilterIterator(const FilterIterator<A,B,F>& o)
-        :f(o.f), s(o.s){
-            static_assert(std::is_same<A, Value>::value, "incompatible iterators");
-            static_assert(std::is_same<B, Source>::value, "incompatible iterators");
-        }
-        
-        template <typename A, typename B, typename F>
-        FilterIterator(FilterIterator<A,B,F>&& o)
-        :f(o.f), s(o.s){
-            static_assert(std::is_same<A, Value>::value, "incompatible iterators");
-            static_assert(std::is_same<B, Source>::value, "incompatible iterators");
         }
         
         template <typename A, typename B, typename F>
         bool operator == (const FilterIterator<A,B,F>& o) const{
             static_assert(std::is_same<A, Value>::value, "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
-            return this->s == o.s;
+            if (finish && finish == o.finish) return true;
+            return s == o.s;
         }
         
         template <typename A, typename B, typename F>
         bool operator != (const FilterIterator<A,B,F>& o) const{
             static_assert(std::is_same<A, Value>::value, "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
-            return s != o.s;
+            return !(*this == o);
         }
         
         Value operator* (){
@@ -94,6 +87,7 @@ namespace func{
             do{
                 ++s;
             }while(s != end && !f(*s));
+            finish = end == s;
             return *this;
         }
         self_type operator++(int){
@@ -102,12 +96,11 @@ namespace func{
             do{
                 ++s;
             }while(s != end && !f(*s));
+            finish = end == s;
             return cpy;
         }
     };
     
-    
-
     template <typename FuncType, typename C, typename Storage_type>
     using filter_t = detail::chaineable_t<
                             FuncType, C, Storage_type, // forward paramenters

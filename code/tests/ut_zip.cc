@@ -168,6 +168,26 @@ TEST(Zip, diff_size){
     EXPECT_EQ(lp.size(), 2);
 }
 
+TEST(Zip, empty){
+
+    // test the traits
+
+
+    // test the struct
+    std::vector<int> a;
+    std::vector<float> b = {.1,.2,.3,.4};
+
+    auto x = func::zip(a,b);
+    EXPECT_TRUE(x.end().finish);
+    EXPECT_TRUE(x.begin().finish);
+    EXPECT_EQ(x.begin(), x.end());
+
+    std::vector<std::pair<int,float>> lp;
+    std::copy(x.begin(), x.end(), std::back_inserter(lp));
+
+    EXPECT_EQ(lp.size(), 0);
+}
+
 /*
 TEST(Zip, three){
     std::vector<int> a = {1,2,3,4};

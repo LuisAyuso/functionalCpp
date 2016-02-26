@@ -149,7 +149,7 @@ namespace func{
         using value_type = Value;
 
         ZipIterator(): finish(true) {}
-        ZipIterator(const T& source, const T& end) : source(source), end(end), finish(source==end) { }
+        ZipIterator(const T& source, const T& end) : source(source), end(end), finish(is_end(source, end)) { }
 
         ZipIterator(const ZipIterator& o) : source(o.source), end(o.end), finish(o.finish) { }
         ZipIterator(ZipIterator&& o) : source(std::move(o.source)), end(std::move(o.end)), finish(o.finish) { }

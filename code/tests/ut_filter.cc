@@ -83,6 +83,8 @@ TEST(Filter, empty){
     // X value
     std::function<int (int)> f =[](int x) -> bool {return x<0;};
     auto x = func::filter(f, std::vector<int>({1,2,3,4,5}));
+
+    EXPECT_EQ(x.begin(), x.end());
     
     std::vector<int> res (x.begin(), x.end());
     EXPECT_EQ(res.size(), 0);

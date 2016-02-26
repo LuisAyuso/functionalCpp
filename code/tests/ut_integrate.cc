@@ -311,6 +311,4 @@ TEST(all, together){
     std::copy(x.begin(), x.end(), std::back_inserter(output));
 
     EXPECT_EQ(output.size(), 0);
-
-    std::cout << output[0].first << "," << output[0].second << std::endl;
 }
