@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -206,8 +206,8 @@ namespace func{
         using inner_iterator_type = get_value_type_t<typename Args::stored_type::iterator...>;
         using iterator = ZipIterator<inner_iterator_type, value_type>;
 
-        /* 
-         * it only accepts rvalues to intialize, 
+        /*
+         * it only accepts rvalues to intialize,
          * a helper function needs to be used to construct the containers and pass them
         */
         zip_t(Args&&... containers) : storage(std::forward<Args>(containers)...) { }
@@ -222,29 +222,21 @@ namespace func{
     };
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   
-    template <typename A, typename B>
-    zip_t<detail::ref_t<A>, detail::ref_t<B>> zip(A& a, B& b){
-        using namespace detail;
-        return zip_t<ref_t<A>,ref_t<B>> (ref_t<A>(a), ref_t<B>(b));
+    template <typename T>
+    constexpr detail::val_t<T> getStorage(T&& v) {
+        return detail::val_t<T>(std::move(v));
     }
 
-    template <typename A, typename B>
-    zip_t<detail::val_t<A>, detail::ref_t<B>> zip(A&& a, B& b){
-        using namespace detail;
-        return zip_t<val_t<A>,ref_t<B>> (val_t<A>(std::move(a)), ref_t<B>(b));
+    template <typename T>
+    constexpr detail::ref_t<T> getStorage(T& v) {
+        return detail::ref_t<T>(v);
     }
 
-    template <typename A, typename B>
-    zip_t<detail::ref_t<A>, detail::val_t<B>> zip(A& a, B&& b){
-        using namespace detail;
-        return zip_t<ref_t<A>,val_t<B>> (ref_t<A>(a), val_t<B>(std::move(b)));
+    template <typename... Args>
+    zip_t<detail::choose_storage_t<func::detail::get_reference_t<Args>>...> zip (Args&&... a) {
+        using namespace func::detail;
+        return zip_t<detail::choose_storage_t<get_reference_t<Args>>...> (getStorage(a)...);
     }
 
-    template <typename A, typename B>
-    zip_t<detail::val_t<A>, detail::val_t<B>> zip(A&& a, B&& b){
-        using namespace detail;
-        return zip_t<val_t<A>,val_t<B>> (val_t<A>(std::move(a)), val_t<B>(std::move(b)));
-    }
 }
 

@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -23,7 +23,7 @@
 
 namespace func{
 namespace detail{
-    
+
     struct Reference_storage{ };
 
     struct Value_storage{ };
@@ -66,19 +66,19 @@ namespace detail{
         C& operator* (){ return storage; }
         C* operator-> (){ return &storage; }
     };
-    
+
     template<
              typename FuncType,          // type of the function
              typename C,                // container type
              typename Storage_type,     // kind of storage (reference or value)
              typename Iterator          // what kind of iterator this chaineable will provide
-                 > 
+                 >
     struct chaineable_t{
 
         using elem_type =  typename detail::get_lambda<FuncType,C>::param_type;
         static_assert(validate_container_function<elem_type, C>::value,
                       "the function does not accept the collection type as paramenter");
-       
+
         using value_type =  typename detail::get_lambda<FuncType,C>::return_type;
         using storage_t = detail::chaineable_store_t<C, Storage_type>;
 
@@ -86,49 +86,57 @@ namespace detail{
         storage_t store;
 
         chaineable_t(FuncType func, storage_t&& store) : func(func), store(std::move(store)) {}
-        
+
         using iterator = Iterator;
         using const_iterator = const Iterator;
-        
+
         chaineable_t (const chaineable_t & ) = delete;
         chaineable_t (chaineable_t&& o) :func(o.func), store(std::move(o.store)) {}
 
         chaineable_t operator= (const chaineable_t&) = delete;
         chaineable_t operator= (chaineable_t&&) = delete;
-        
+
         iterator begin(){
             return iterator(func, store.storage.begin(), store.storage.end());
         }
-        
+
         iterator end(){
             return iterator(func, store.storage.end(), store.storage.end());
         }
-        
+
         const_iterator begin() const{
             return const_iterator(func, store.storage.begin());
         }
-        
+
         const_iterator end() const{
             return const_iterator(func, store.storage.end());
         }
     };
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+
     template <typename T>
     using ref_t =  chaineable_store_t<T, Reference_storage>;
     template <typename T>
     using val_t =  chaineable_store_t<T, Value_storage>;
-    
-//    template<typename T>
-//    ref_t<T> ref(T& t){
-//        return ref_t<T>(t);
-//    }
-//    template<typename T>
-//    val_t<T> val(T&& t){
-//        return val_t<T>(std::move(t));
-//    }
 
+
+    // helper template metafunction that selects the right storage according to the given input
+    template <typename T>
+    struct choose_storage;
+
+    template <typename T>
+    struct choose_storage<T&&> {
+        using type = val_t<T>;
+    };
+
+    template <typename T>
+    struct choose_storage<T&> {
+        using type = ref_t<T>;
+    };
+
+    template <typename T>
+    using choose_storage_t = typename choose_storage<T>::type;
 
 }// detail namespace
 }// func namespace

@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -24,6 +24,7 @@
 namespace func {
 namespace detail {
 
+    // remove qualification and reference
     template <class T>
     struct remove_all {
         using type = typename std::remove_reference<typename std::remove_cv<T>::type>::type;
@@ -32,6 +33,7 @@ namespace detail {
     template<class T>
     using remove_all_t = typename remove_all<T>::type;
 
+    //simplify pair (remove cv and ref of first and second
     template <class T>
     struct symplify_pair {
         using type = T;
@@ -147,9 +149,26 @@ namespace detail {
 
     //random access iterators will derive from this struct
     template <typename V, typename T>
-    struct is_ra_iterable<V,T,true> : public std::iterator<std::bidirectional_iterator_tag, V> {
+    struct is_ra_iterable<V,T,true> : public std::iterator<std::bidirectional_iterator_tag, V> {};
 
+    //get reference in case the input is a non-ref. If it is a already a ref don't modify
+    template <typename R>
+    struct get_reference {
+        using type = R&;
     };
+
+    template <typename R>
+    struct get_reference<R&> {
+        using type = R&;
+    };
+
+    template <typename R>
+    struct get_reference<R&&> {
+        using type = R&&;
+    };
+
+    template <typename R>
+    using get_reference_t = typename get_reference<R>::type;
 
  } // end namespace detail
  } // end namespace func
