@@ -28,7 +28,44 @@ namespace func {
     struct FilterIterator;
     template <typename V>
     struct SequenceIterator;
+}
 
+namespace std {
+
+    //  Clang compiler runs into some trouble with the custom 
+    //  iterator traits, lets just define here some standard
+    //  espetializations so everyone is happy
+
+    template<typename V, typename S, typename F>
+    struct iterator_traits<func::TransformIterator<V,S,F>>{
+        using difference_type   = typename std::iterator_traits<S>::difference_type;
+        using value_type        = V;
+        using pointer           = const V*;
+        using reference         = const V&;
+        using iterator_category = std::input_iterator_tag;
+    };
+        
+    template<typename V, typename S, typename F>
+    struct iterator_traits<func::FilterIterator<V,S,F>>{
+        using difference_type   = typename std::iterator_traits<S>::difference_type;
+        using value_type        = V;
+        using pointer           = const V*;
+        using reference         = const V&;
+        using iterator_category = std::input_iterator_tag;
+    };
+
+    template<typename V>
+    struct iterator_traits<func::SequenceIterator<V>>{
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = V;
+        using pointer           = V*;
+        using reference         = V&;
+        using iterator_category = std::input_iterator_tag;
+    };
+}
+
+
+namespace func {
 namespace detail {
 
     template <typename Iter>
@@ -37,11 +74,13 @@ namespace detail {
     template <typename Iter, typename Value, typename Category>
     struct iterator_type_aux;
 
-
-
     template <typename Iter, typename Value>
     struct iterator_type : public std::iterator<std::input_iterator_tag, Value> {
-        static const bool is_parallel_iterator = iterator_type_aux<Iter, Value, typename Iter::iterator_category>::is_parallel_iterator;
+        static const bool is_parallel_iterator = iterator_type_aux<
+                                                            Iter, 
+                                                            Value, 
+                                                            typename std::iterator_traits<Iter>::iterator_category   
+                                                      >::is_parallel_iterator;
     };
 
     template <typename Value, typename Source, typename Func, typename Category>

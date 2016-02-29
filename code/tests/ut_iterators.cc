@@ -113,9 +113,15 @@ TEST (Iterators, concept){
 TEST (Iterators, parallel_iterator) {
     using vec = std::vector<int>;
     using list = std::list<int>;
+    ASSERT_TRUE( (std::is_same< vec::iterator::iterator_category, std::random_access_iterator_tag>()) );
 
     using transform_par = func::TransformIterator<int,vec::iterator,std::function<int(int)>>;
     using transform_no_par = func::TransformIterator<int,list::iterator,std::function<int(int)>>;
+
+    ASSERT_TRUE( (std::is_same< transform_par::iterator_category, std::input_iterator_tag>()) );
+    ASSERT_TRUE( (std::is_same< transform_par::iterator::iterator_category, std::input_iterator_tag>()) );
+    ASSERT_TRUE( (std::is_same< std::iterator_traits<transform_par>::iterator_category, std::input_iterator_tag>()) );
+
     ASSERT_TRUE(transform_par::is_parallel_iterator);
     ASSERT_FALSE(transform_no_par::is_parallel_iterator);
 

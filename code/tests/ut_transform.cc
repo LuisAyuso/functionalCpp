@@ -202,6 +202,9 @@ TEST(Transform, std_function){
         m[2] = 0.1;
         std::function<int (std::pair<const int,float>)> f =[](std::pair<int, float> x) -> int {return x.first;};
         auto x = func::transform(f,m);
+
+        static_assert(std::is_same< std::iterator_traits<decltype(x.begin())>::iterator_category, std::input_iterator_tag>(), "" );
+        static_assert(std::is_same< std::iterator_traits<decltype(x.end())>::iterator_category, std::input_iterator_tag>(), "" );
         
         std::vector<int> res (x.begin(), x.end());
         EXPECT_THAT(res, ElementsAre(1,2));
