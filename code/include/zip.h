@@ -22,6 +22,7 @@
 #include <cassert>
 
 #include "detail/utils.h"
+#include "detail/iterators.h"
 #include "detail/chaineable.h"
 
 namespace func{
@@ -142,7 +143,7 @@ namespace func{
 
     // iterator
     template <typename T, typename Value>
-    struct ZipIterator : public std::iterator<std::input_iterator_tag, Value> {
+    struct ZipIterator : public detail::iterator_type<ZipIterator<T,Value>, Value> {
         T source, end;
         bool finish;
         using inner_type = T;

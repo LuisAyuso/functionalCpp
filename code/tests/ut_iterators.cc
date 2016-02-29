@@ -25,8 +25,10 @@
 #include <array>
 
 #include "detail/utils.h"
+#include "detail/iterators.h"
 #include "transform.h"
 #include "filter.h"
+#include "zip.h"
 
 template<typename T>
 class my_iter: public std::iterator<std::forward_iterator_tag, T>{
@@ -111,6 +113,16 @@ TEST (Iterators, concept){
 }
 
 TEST (Iterators, parallel_iterator) {
+    using p = std::pair<int,int>;
+    using t = std::tuple<int,float,bool>;
+
+    EXPECT_EQ((std::is_same<func::detail::remove_first_type<p>::type, std::tuple<int>>::value), true);
+    EXPECT_EQ((std::is_same<func::detail::remove_first_type<func::detail::remove_first_type<p>::type>::type, std::tuple<>>::value), true);
+
+    EXPECT_EQ((std::is_same<func::detail::remove_first_type<t>::type, std::tuple<float,bool>>::value), true);
+    EXPECT_EQ((std::is_same<func::detail::remove_first_type<func::detail::remove_first_type<t>::type>::type, std::tuple<bool>>::value), true);
+
+
     using vec = std::vector<int>;
     using list = std::list<int>;
     ASSERT_TRUE( (std::is_same< vec::iterator::iterator_category, std::random_access_iterator_tag>()) );
@@ -139,5 +151,18 @@ TEST (Iterators, parallel_iterator) {
     using trans_filter = func::TransformIterator<int,filter_vec,std::function<int(int)>>;
     ASSERT_FALSE(filter_trans::is_parallel_iterator);
     ASSERT_FALSE(trans_filter::is_parallel_iterator);
+
+    using zip_par = func::ZipIterator<std::pair<vec::iterator,vec::iterator>, std::pair<int,int>>;
+    using zip_par_one = func::ZipIterator<std::pair<transform_par,transform_par>, std::pair<int,int>>;
+    using zip_par_two = func::ZipIterator<std::pair<transform_par,filter_vec>, std::pair<int,int>>;
+    using zip_no_par = func::ZipIterator<std::pair<vec::iterator,list::iterator>, std::pair<int,int>>;
+    using zip_no_par_one = func::ZipIterator<std::pair<list::iterator,vec::iterator>, std::pair<int,int>>;
+    using zip_no_par_two = func::ZipIterator<std::pair<list::iterator,list::iterator>, std::pair<int,int>>;
+    ASSERT_TRUE(zip_par::is_parallel_iterator);
+    ASSERT_TRUE(zip_par_one::is_parallel_iterator);
+    ASSERT_FALSE(zip_par_two::is_parallel_iterator);
+    ASSERT_FALSE(zip_no_par::is_parallel_iterator);
+    ASSERT_FALSE(zip_no_par_one::is_parallel_iterator);
+    ASSERT_FALSE(zip_no_par_two::is_parallel_iterator);
 
 }

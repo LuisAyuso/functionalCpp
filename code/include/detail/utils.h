@@ -20,6 +20,7 @@
 
 #include <type_traits>
 #include <functional>
+#include <tuple>
 
 namespace func {
 namespace detail {
@@ -151,5 +152,19 @@ namespace detail {
     template <typename R>
     using get_reference_t = typename get_reference<R>::type;
 
- } // end namespace detail
- } // end namespace func
+    //remove first type from a tuple
+    template<typename T>
+    struct remove_first_type;
+
+    template<typename T, typename... Ts>
+    struct remove_first_type<std::tuple<T, Ts...>> {
+        using type = std::tuple<Ts...>;
+    };
+
+    template<typename T1, typename T2>
+    struct remove_first_type<std::pair<T1, T2>> {
+        using type = std::tuple<T2>;
+    };
+
+} // end namespace detail
+} // end namespace func
