@@ -24,10 +24,11 @@ Reduce, compute some scalar value based on all elements in collection.
 
 ## In the roadmap:
 
-  + More awareness of the iterators, random access iterator provided when available (Transform)
+  + ~~More awareness of the iterators, random access iterator provided when available (Transform)~~
   + IO. Functional containers can manipulate infinite input streams. Lets implement some File and/or network sources.
-  + Parallelism: When random access iterators are available, we can chunk it and process in parallel.
+  + Parallelism: When ~~random~~ (parallel) access iterators are available, we can chunk it and process in parallel.
   + Pipelining: When there are no random access iterators, we can buffer part of the computation and pipeline it over the processors.
+  + OutputIterators
 
 
 ## License
