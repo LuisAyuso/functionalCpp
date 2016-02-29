@@ -18,9 +18,31 @@ Filter elements based on custom criteria, the arity of the resulting collection 
 ###Generator:          
 Currently there is a sequence generator, defined by a start value and step.
 ###Zip:          
-Merge N collections into a collection of aggregates. If two collections, produces pairs, if more, produces tuples.
+Merge N collections into a collection of aggregates. If two collections, produces a collection of pairs, if more, produces collection a of tuples.
 ###Reduce: 
 Reduce, compute some scalar value based on all elements in collection.
+
+## Parallel iterators:
+
+We are in the era of multicores! Lets do some multiprocessing. 
+Traditional parallel loops require of random access iterators to: first, compute the number of iterations, and second,  access elements with a certain offset. 
+Although we can provide (in some scenarios) this functionality. We can no guarantee all the requirements of standard iterators traits (see: [standard](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) ).
+
+For this reason iterators will be marked as parallel iterators when possible:
+
+| Operation     | Parallel?                                                      |
+| ------------- |:--------------------------------------------------------------:|
+| Transform     | **Yes** if nested collection can be accessed in parallel       |
+| Filter        | **No**, never                                                  |
+| Zip           | **Yes**, if all nested collections can be accessed in parallel |
+| Sequence      | **Yes**, why not?                                              |
+
+A collection will be accessed in parallel whenever it provides random access iterators:
+
+A parallel iterator provides extra methods
+- operator +
+- operator - (for scalar and for iterator difference)
+- operator [] 
 
 ## In the roadmap:
 
@@ -28,8 +50,7 @@ Reduce, compute some scalar value based on all elements in collection.
   + IO. Functional containers can manipulate infinite input streams. Lets implement some File and/or network sources.
   + Parallelism: When ~~random~~ (parallel) access iterators are available, we can chunk it and process in parallel.
   + Pipelining: When there are no random access iterators, we can buffer part of the computation and pipeline it over the processors.
-  + OutputIterators
-
+  + OutputIterators: Could we use a filter iterator as left side of an assignment? 
 
 ## License
 
