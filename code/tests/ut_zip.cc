@@ -253,3 +253,16 @@ TEST(Zip, pass_by_x){
     EXPECT_FLOAT_EQ (*(std::get<2>(it.source)), 0.4);
 }
 
+TEST(Zip, four){
+    std::vector<int> a = {1,2,3,4};
+    std::vector<float> b = {.1,.2,.3,.4};
+    std::vector<double> c = {.1,.2,.3,.4};
+
+    auto x = func::zip(a,b,c);
+    EXPECT_TRUE((*x.begin() == std::tuple<int,float,double>(1,0.1,0.1)));
+    EXPECT_TRUE(((x.begin()[3]) == std::tuple<int,float,double>(4,0.4,0.4)));
+    EXPECT_TRUE((*(x.begin()+1) == std::tuple<int,float,double>(2,0.2,0.2)));
+    EXPECT_TRUE((x.begin()+4) == x.end());
+    EXPECT_EQ(*((x.begin()+3)-2), (std::tuple<int,float,double>(2,0.2,0.2)));
+    EXPECT_EQ((x.end()-x.begin()),4);
+}

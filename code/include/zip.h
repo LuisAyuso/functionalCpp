@@ -99,6 +99,18 @@ namespace func{
                 std::get<N>(output) = *std::get<N>(input);
                 trf<T1,T2,N-1>::apply_ind(input, output);
             }
+            static void apply_plus(T1& input, T2& output, int i) {
+                std::get<N>(output) = std::get<N>(input) + i;
+                trf<T1,T2,N-1>::apply_plus(input, output, i);
+            }
+            static void apply_minus(T1& input, T2& output, int i) {
+                std::get<N>(output) = std::get<N>(input) - i;
+                trf<T1,T2,N-1>::apply_minus(input, output, i);
+            }
+            static void apply_bracket(T1& input, T2& output, int i) {
+                std::get<N>(output) = std::get<N>(input)[i];
+                trf<T1,T2,N-1>::apply_bracket(input, output, i);
+            }
         };
 
         template <typename T1, typename T2>
@@ -109,6 +121,15 @@ namespace func{
             static void apply_ind(T1& input, T2& output) {
                 std::get<0>(output) = *std::get<0>(input);
             }
+            static void apply_plus(T1& input, T2& output, int i) {
+                std::get<0>(output) = std::get<0>(input) + i;
+            }
+            static void apply_minus(T1& input, T2& output, int i) {
+                std::get<0>(output) = std::get<0>(input) - i;
+            }
+            static void apply_bracket(T1& input, T2& output, int i) {
+                std::get<0>(output) = std::get<0>(input)[i];
+            }
         };
 
         template <typename T>
@@ -118,6 +139,18 @@ namespace func{
         template <typename T, typename V>
         void asterisk (T& source, V& target){
             trf<T, V, std::tuple_size<T>::value-1>::apply_ind(source, target);
+        }
+        template <typename T, typename V>
+        void plus (T& source, V& target, int i){
+            trf<T, V, std::tuple_size<T>::value-1>::apply_plus(source, target, i);
+        }
+        template <typename T, typename V>
+        void minus (T& source, V& target, int i){
+            trf<T, V, std::tuple_size<T>::value-1>::apply_minus(source, target, i);
+        }
+        template <typename T, typename V>
+        void bracket (T& source, V& target, int i){
+            trf<T, V, std::tuple_size<T>::value-1>::apply_bracket(source, target, i);
         }
 
         /**************** Check if tuple reaches end ******************/
@@ -193,6 +226,35 @@ namespace func{
             asterisk(source, vals);
             return vals;
         }
+
+        template <typename S = ZipIterator, typename = typename std::enable_if<S::is_parallel_iterator>::type>
+        value_type operator[](unsigned i) {
+            value_type x;
+            bracket(source, x, i);
+            return x;
+        }
+
+        template <typename S = ZipIterator, typename = typename std::enable_if<S::is_parallel_iterator>::type>
+        S operator+ (int i) {
+            //apply operator+ on whole tuple
+            S cpy = *this;
+            plus(source, cpy.source, i);
+            return cpy;
+        }
+
+        template <typename S = ZipIterator, typename = typename std::enable_if<S::is_parallel_iterator>::type>
+        S operator- (int i) {
+            //apply operator- on whole tuple
+            S cpy = *this;
+            minus(source, cpy.source, i);
+            return cpy;
+        }
+
+        template <typename S = ZipIterator, typename = typename std::enable_if<S::is_parallel_iterator>::type>
+        typename std::iterator_traits<S>::difference_type operator- (const S& o) {
+            return std::get<0>(source)-std::get<0>(o.source);
+        }
+
     };
 
 
