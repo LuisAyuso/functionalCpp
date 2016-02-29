@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -25,6 +25,8 @@
 #include <array>
 
 #include "detail/utils.h"
+#include "transform.h"
+#include "filter.h"
 
 template<typename T>
 class my_iter: public std::iterator<std::forward_iterator_tag, T>{
@@ -108,49 +110,28 @@ TEST (Iterators, concept){
         EXPECT_EQ(x , 11);
 }
 
-TEST (Iterators, random_access) {
-    std::vector<int> v = {1,2,3};
-    std::list<int> l = {1,2,3};
-    std::array<int,3> a = {1,2,3};
-    std::map<int,int> m = {{1,2},{2,3},{3,4}};
+TEST (Iterators, parallel_iterator) {
+    using vec = std::vector<int>;
+    using list = std::list<int>;
 
-    //Test if it is possible to identify some container as random iterable or not
-    EXPECT_TRUE(func::detail::has_ra_iter<decltype(v)::iterator>::value);
-    EXPECT_TRUE((func::detail::has_ra_iter<decltype(a)::iterator>::value));
-    EXPECT_FALSE(func::detail::has_ra_iter<decltype(l)::iterator>::value);
-    EXPECT_FALSE((func::detail::has_ra_iter<decltype(m)::iterator>::value));
+    using transform_par = func::TransformIterator<int,vec::iterator,std::function<int(int)>>;
+    using transform_no_par = func::TransformIterator<int,list::iterator,std::function<int(int)>>;
+    ASSERT_TRUE(transform_par::is_parallel_iterator);
+    ASSERT_FALSE(transform_no_par::is_parallel_iterator);
 
-    //We can derive from is_ra_iterable<Container> metafunction in order to 
-    //automatically derive from different classes for random or non random iterable containers
-    //test vector
-    EXPECT_TRUE((std::is_base_of<std::iterator<std::bidirectional_iterator_tag, int>,
-                                 typename func::detail::is_ra_iterable<int,decltype(v)::iterator>
-                                 >::value));
-    EXPECT_FALSE((std::is_base_of<std::iterator<std::input_iterator_tag, int>,
-                                 typename func::detail::is_ra_iterable<int,decltype(v)::iterator>
-                                 >::value));
-    //test array
-    EXPECT_TRUE((std::is_base_of<std::iterator<std::bidirectional_iterator_tag, int>,
-                                 typename func::detail::is_ra_iterable<int,decltype(a)::iterator>
-                                 >::value));
-    EXPECT_FALSE((std::is_base_of<std::iterator<std::input_iterator_tag, int>,
-                                 typename func::detail::is_ra_iterable<int,decltype(a)::iterator>
-                                 >::value));
+    using filter_vec = func::FilterIterator<int,vec::iterator,std::function<int(int)>>;
+    using filter_list = func::FilterIterator<int,list::iterator,std::function<int(int)>>;
+    ASSERT_FALSE(filter_vec::is_parallel_iterator);
+    ASSERT_FALSE(filter_list::is_parallel_iterator);
 
-    //list array
-    EXPECT_FALSE((std::is_base_of<std::iterator<std::bidirectional_iterator_tag, int>,
-                                 typename func::detail::is_ra_iterable<int,decltype(l)::iterator>
-                                 >::value));
-    EXPECT_TRUE((std::is_base_of<std::iterator<std::input_iterator_tag, int>,
-                                 typename func::detail::is_ra_iterable<int,decltype(l)::iterator>
-                                 >::value));
+    using nested_par = func::TransformIterator<int,transform_par,std::function<int(int)>>;
+    using nested_no_par = func::TransformIterator<int,transform_no_par,std::function<int(int)>>;
+    ASSERT_TRUE(nested_par::is_parallel_iterator);
+    ASSERT_FALSE(nested_no_par::is_parallel_iterator);
 
-    //map array
-    EXPECT_FALSE((std::is_base_of<std::iterator<std::bidirectional_iterator_tag, std::pair<int,int>>,
-                                 typename func::detail::is_ra_iterable<std::pair<int,int>,decltype(m)::iterator>
-                                 >::value));
-    EXPECT_TRUE((std::is_base_of<std::iterator<std::input_iterator_tag, std::pair<int,int>>,
-                                 typename func::detail::is_ra_iterable<std::pair<int,int>,decltype(m)::iterator>
-                                 >::value));
+    using filter_trans = func::FilterIterator<int,transform_par,std::function<int(int)>>;
+    using trans_filter = func::TransformIterator<int,filter_vec,std::function<int(int)>>;
+    ASSERT_FALSE(filter_trans::is_parallel_iterator);
+    ASSERT_FALSE(trans_filter::is_parallel_iterator);
 
 }

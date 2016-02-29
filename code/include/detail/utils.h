@@ -132,25 +132,6 @@ namespace detail {
     };
 
 
-    //check if an iterator is a random access iterator
-    template <typename Container>
-    using has_ra_iter = typename std::is_same<typename std::iterator_traits<Container>::iterator_category, std::random_access_iterator_tag>;
-
-    //evaluate has_ra_iter<Container>
-    template <typename Container>
-    using has_ra_iter_v = typename has_ra_iter<Container>::value;
-
-    template <typename V, typename T, bool = has_ra_iter<T>::value>
-    struct is_ra_iterable;
-
-    //non random access iterators will derive from this struct
-    template <typename V, typename T>
-    struct is_ra_iterable<V,T,false> : public std::iterator<std::input_iterator_tag, V> {};
-
-    //random access iterators will derive from this struct
-    template <typename V, typename T>
-    struct is_ra_iterable<V,T,true> : public std::iterator<std::bidirectional_iterator_tag, V> {};
-
     //get reference in case the input is a non-ref. If it is a already a ref don't modify
     template <typename R>
     struct get_reference {

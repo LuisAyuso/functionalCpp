@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -21,67 +21,69 @@
 #include <iterator>
 
 #include "detail/utils.h"
+#include "detail/iterators.h"
 #include "detail/chaineable.h"
 
 namespace func{
-    
+
     template<typename Value, typename Source, typename Func>
-    struct TransforIterator : public std::iterator<std::input_iterator_tag, Value>{
+    struct TransformIterator : public detail::iterator_type<TransformIterator<Value, Source, Func>, Value> {
 
         Func& f;
         Source s;
-        
-        using self_type = TransforIterator<Value, Source, Func>;
 
-        TransforIterator(Func& f, const Source s, const Source)
+        using source_type = Source;
+        using self_type = TransformIterator<Value, Source, Func>;
+
+        TransformIterator(Func& f, const Source s, const Source)
         :f(f), s(s) {}
-        
-        TransforIterator(const TransforIterator& o)
+
+        TransformIterator(const TransformIterator& o)
         : f(o.f), s(o.s)
         {}
 
-        TransforIterator(TransforIterator&& o)
+        TransformIterator(TransformIterator&& o)
         : f(o.f), s(std::move(o.s))
         {}
-        
-        TransforIterator& operator= (const TransforIterator& o){
+
+        TransformIterator& operator= (const TransformIterator& o){
             s = o.s;
             return *this;
         }
-        
-        TransforIterator& operator= (TransforIterator&& o){
+
+        TransformIterator& operator= (TransformIterator&& o){
             std::swap(s, o.s);
             return *this;
         }
-        
+
         template <typename A, typename B, typename F>
-        TransforIterator(const TransforIterator<A,B,F>& o)
+        TransformIterator(const TransformIterator<A,B,F>& o)
         :f(o.f), s(o.s){
             static_assert(std::is_same<A, Value>::value,  "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
         }
-        
+
         template <typename A, typename B, typename F>
-        TransforIterator(TransforIterator<A,B,F>&& o)
+        TransformIterator(TransformIterator<A,B,F>&& o)
         :f(o.f), s(o.s){
             static_assert(std::is_same<A, Value>::value,  "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
         }
-        
+
         template <typename A, typename B, typename F>
-        bool operator == (const TransforIterator<A,B,F>& o) const{
+        bool operator == (const TransformIterator<A,B,F>& o) const{
             static_assert(std::is_same<A, Value>::value,  "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
             return this->s == o.s;
         }
-        
+
         template <typename A, typename B, typename F>
-        bool operator != (const TransforIterator<A,B,F>& o) const{
+        bool operator != (const TransformIterator<A,B,F>& o) const{
             static_assert(std::is_same<A, Value>::value,  "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
             return s != o.s;
         }
-        
+
         Value operator* (){
             return f(*s);
         }
@@ -95,20 +97,41 @@ namespace func{
             ++s;
             return cpy;
         }
+
+        template <typename S = self_type, typename = typename std::enable_if<S::is_parallel_iterator>::type>
+        Value operator[](unsigned i) {
+            return f(s[i]);
+        }
+
+        template <typename S = self_type, typename = typename std::enable_if<S::is_parallel_iterator>::type>
+        S operator+ (int i) {
+            return S(f, s+i, s);
+        }
+
+        template <typename S = self_type, typename = typename std::enable_if<S::is_parallel_iterator>::type>
+        S operator- (int i) {
+            return S(f, s-i, s);
+        }
+
+        template <typename S = self_type, typename = typename std::enable_if<S::is_parallel_iterator>::type>
+        typename std::iterator_traits<S>::difference_type operator- (const S& o) {
+            return s-o.s;
+        }
+
     };
 
 
-   template <typename FuncType, typename C, typename Storage_type> 
+   template <typename FuncType, typename C, typename Storage_type>
     using transform_t = detail::chaineable_t<
                             FuncType, C, Storage_type, // forward paramenters
-                            TransforIterator<typename detail::get_lambda<FuncType,C>::return_type, typename C::iterator, FuncType > // specific iterator type for transformation
+                            TransformIterator<typename detail::get_lambda<FuncType,C>::return_type, typename C::iterator, FuncType > // specific iterator type for transformation
                                 >;
 
 
     // for function type
     // lvalue collection
     template <typename N, typename R, typename C>
-    transform_t<std::function<R (N)>,C,detail::Reference_storage> 
+    transform_t<std::function<R (N)>,C,detail::Reference_storage>
     transform(std::function<R (N)> f, C& c){
         return transform_t<std::function<R(N)>,C,detail::Reference_storage> (f, detail::chaineable_store_t<C,detail::Reference_storage> (c));
     }
@@ -116,7 +139,7 @@ namespace func{
     // for function type
     // rvalue collection
     template <typename N, typename R, typename C>
-    transform_t<std::function<R(N)>,C,detail::Value_storage> 
+    transform_t<std::function<R(N)>,C,detail::Value_storage>
     transform(std::function<R (N)> f, C&& c){
         return transform_t<std::function<R(N)>,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
     }

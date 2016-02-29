@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -69,3 +69,29 @@ TEST(Generator, Sequence_f){
     }
 }
 
+TEST(Generator, Limited_Sequence){
+
+    auto x = func::sequence(0.0, 1.0, 10);
+    auto it = x.begin();
+    for (int i=0; i < 10; ++i){
+        ASSERT_FLOAT_EQ (*it, i);
+        ++it;
+    }
+    EXPECT_EQ(it.count, 0);
+    EXPECT_EQ(it, x.end());
+    EXPECT_FLOAT_EQ(it.v, 10.0);
+}
+
+TEST(Generator, Limited_Sequence_Methods){
+
+    auto x = func::sequence(0, 1, 10);
+    auto it = x.begin();
+
+    EXPECT_EQ(it[1], 1);
+    EXPECT_EQ(it[5], 5);
+    EXPECT_EQ(*(it+3), 3);
+    it++;
+    it++;
+    EXPECT_EQ(*(it), 2);
+    EXPECT_EQ(*(it-1), 1);
+}

@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -21,20 +21,21 @@
 #include <cassert>
 
 #include "detail/utils.h"
+#include "detail/iterators.h"
 #include "detail/chaineable.h"
 
 namespace func{
-    
+
     template<typename Value, typename Source, typename Func>
-    struct FilterIterator: public std::iterator<std::input_iterator_tag, Value>{
-        
+    struct FilterIterator: public detail::iterator_type<FilterIterator<Value, Source, Func>, Value>  {
+
         Func& f;
         Source s;
         Source end;
         bool finish;
-        
+
         using self_type = FilterIterator<Value, Source, Func>;
-        
+
         FilterIterator(Func& f, const Source beg, const Source end)
         :f(f), s(beg), end(end) {
             while(s != end && !f(*s)){
@@ -61,7 +62,7 @@ namespace func{
             finish = o.finish;
             return *this;
         }
-        
+
         template <typename A, typename B, typename F>
         bool operator == (const FilterIterator<A,B,F>& o) const{
             static_assert(std::is_same<A, Value>::value, "incompatible iterators");
@@ -69,19 +70,19 @@ namespace func{
             if (finish && finish == o.finish) return true;
             return s == o.s;
         }
-        
+
         template <typename A, typename B, typename F>
         bool operator != (const FilterIterator<A,B,F>& o) const{
             static_assert(std::is_same<A, Value>::value, "incompatible iterators");
             static_assert(std::is_same<B, Source>::value, "incompatible iterators");
             return !(*this == o);
         }
-        
+
         Value operator* (){
             assert(s != end && "deref and end iterator");
             return *s;
         }
-        
+
         self_type& operator++(){
             assert(s != end && "move and end iterator");
             do{
@@ -100,7 +101,7 @@ namespace func{
             return cpy;
         }
     };
-    
+
     template <typename FuncType, typename C, typename Storage_type>
     using filter_t = detail::chaineable_t<
                             FuncType, C, Storage_type, // forward paramenters
