@@ -64,6 +64,15 @@ namespace std {
         using reference         = V&;
         using iterator_category = std::input_iterator_tag;
     };
+
+    template<typename I, typename V>
+    struct iterator_traits<func::ZipIterator<I,V>>{
+        using difference_type   =  std::ptrdiff_t;
+        using value_type        = V;
+        using pointer           = V*;
+        using reference         = V&;
+        using iterator_category = std::input_iterator_tag;
+    };
 }
 
 
