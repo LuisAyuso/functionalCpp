@@ -182,6 +182,7 @@ TEST(Zip, empty){
     std::copy(x.begin(), x.end(), std::back_inserter(lp));
 
     EXPECT_EQ(lp.size(), 0);
+    EXPECT_EQ(x.end()-x.begin(), 0);
 }
 
 TEST(Zip, three){
@@ -253,7 +254,7 @@ TEST(Zip, pass_by_x){
     EXPECT_FLOAT_EQ (*(std::get<2>(it.source)), 0.4);
 }
 
-TEST(Zip, four){
+TEST(Zip, zip_methods_same_size){
     std::vector<int> a = {1,2,3,4};
     std::vector<float> b = {.1,.2,.3,.4};
     std::vector<double> c = {.1,.2,.3,.4};
@@ -266,3 +267,4 @@ TEST(Zip, four){
     EXPECT_EQ(*((x.begin()+3)-2), (std::tuple<int,float,double>(2,0.2,0.2)));
     EXPECT_EQ((x.end()-x.begin()),4);
 }
+

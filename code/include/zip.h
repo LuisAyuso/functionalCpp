@@ -20,6 +20,7 @@
 #pragma once
 #include <iterator>
 #include <cassert>
+#include <algorithm>
 
 #include "detail/utils.h"
 #include "detail/iterators.h"
@@ -111,6 +112,10 @@ namespace func{
                 std::get<N>(output) = std::get<N>(input)[i];
                 trf<T1,T2,N-1>::apply_bracket(input, output, i);
             }
+            static void apply_sizes(const T1& iter_input_1, const T1& iter_input_2, T2& target) {
+                target[N] = std::get<N>(iter_input_1)-std::get<N>(iter_input_2);
+                trf<T1,T2,N-1>::apply_sizes(iter_input_1, iter_input_2, target);
+            }
         };
 
         template <typename T1, typename T2>
@@ -129,6 +134,9 @@ namespace func{
             }
             static void apply_bracket(T1& input, T2& output, int i) {
                 std::get<0>(output) = std::get<0>(input)[i];
+            }
+            static void apply_sizes(const T1& iter_input_1, const T1& iter_input_2, T2& target) {
+                target[0] = std::get<0>(iter_input_1)-std::get<0>(iter_input_2);
             }
         };
 
@@ -151,6 +159,10 @@ namespace func{
         template <typename T, typename V>
         void bracket (T& source, V& target, int i){
             trf<T, V, std::tuple_size<T>::value-1>::apply_bracket(source, target, i);
+        }
+        template <typename T, typename V>
+        void sizes (const T& iter_input_1, const T& iter_input_2, V& target) {
+            trf<T, V, std::tuple_size<T>::value-1>::apply_sizes(iter_input_1, iter_input_2, target);
         }
 
         /**************** Check if tuple reaches end ******************/
@@ -239,6 +251,7 @@ namespace func{
             //apply operator+ on whole tuple
             S cpy = *this;
             plus(source, cpy.source, i);
+            cpy.finish = is_end(cpy.source, cpy.end);
             return cpy;
         }
 
@@ -247,12 +260,16 @@ namespace func{
             //apply operator- on whole tuple
             S cpy = *this;
             minus(source, cpy.source, i);
+            cpy.finish = is_end(cpy.source, cpy.end);
             return cpy;
         }
 
         template <typename S = ZipIterator, typename = typename std::enable_if<S::is_parallel_iterator>::type>
         typename std::iterator_traits<S>::difference_type operator- (const S& o) {
-            return std::get<0>(source)-std::get<0>(o.source);
+            // get the smallest possible distance
+            std::array<unsigned, std::tuple_size<T>::value> s;
+            sizes(source, o.source, s);
+            return *std::min_element(s.begin(),s.end());
         }
 
     };
