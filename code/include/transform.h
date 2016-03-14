@@ -121,10 +121,13 @@ namespace func{
     };
 
 
-   template <typename FuncType, typename C, typename Storage_type>
+   template <typename FuncType, typename Container, typename Storage_type>
     using transform_t = detail::chaineable_t<
-                            FuncType, C, Storage_type, // forward paramenters
-                            TransformIterator<typename detail::get_lambda<FuncType,C>::return_type, typename C::iterator, FuncType > // specific iterator type for transformation
+                            FuncType, 
+                            Container, 
+                            Storage_type, 
+                            typename detail::get_lambda<FuncType,Container>::return_type,
+                            TransformIterator<typename detail::get_lambda<FuncType,Container>::return_type, typename Container::iterator, FuncType > // specific iterator type for transformation
                                 >;
 
 

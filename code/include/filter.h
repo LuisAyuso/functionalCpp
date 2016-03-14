@@ -102,10 +102,13 @@ namespace func{
         }
     };
 
-    template <typename FuncType, typename C, typename Storage_type>
+    template <typename FuncType, typename Container, typename Storage_type>
     using filter_t = detail::chaineable_t<
-                            FuncType, C, Storage_type, // forward paramenters
-                            FilterIterator<typename C::value_type, typename C::iterator, FuncType > // specific iterator type for transformation
+                            FuncType, 
+                            Container, 
+                            Storage_type,
+                            typename Container::value_type,
+                            FilterIterator<typename Container::value_type, typename Container::iterator, FuncType > // specific iterator type for transformation
                                 >;
 
     // for function type

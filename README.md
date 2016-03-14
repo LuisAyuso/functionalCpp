@@ -21,6 +21,8 @@ Currently there is a sequence generator, defined by a start value and step.
 Merge N collections into a collection of aggregates. If two collections, produces a collection of pairs, if more, produces collection a of tuples.
 ###Reduce: 
 Reduce, compute some scalar value based on all elements in collection.
+###Compact
+Given a transformation functor, the resulting collection has different arity than the original one. e.g. It can be used to turn a text into a list of lines.
 
 ## Parallel iterators:
 
@@ -36,6 +38,7 @@ For this reason iterators will be marked as parallel iterators when possible:
 | Filter        | **No**, never                                                  |
 | Zip           | **Yes**, if all nested collections can be accessed in parallel |
 | Sequence      | **Yes**, why not?                                              |
+| Compact       | **No**                                                         |
 
 A collection will be accessed in parallel whenever it provides random access iterators:
 

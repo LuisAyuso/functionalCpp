@@ -68,19 +68,21 @@ namespace detail{
     };
 
     template<
-             typename FuncType,          // type of the function
-             typename C,                // container type
+             typename FuncType,         // type of the function
+             typename Container,        // container type
              typename Storage_type,     // kind of storage (reference or value)
+             typename Value_type,       // what values this chainable will produce 
              typename Iterator          // what kind of iterator this chaineable will provide
                  >
     struct chaineable_t{
 
-        using elem_type =  typename detail::get_lambda<FuncType,C>::param_type;
-        static_assert(validate_container_function<elem_type, C>::value,
-                      "the function does not accept the collection type as paramenter");
+        // FIXME: this is valid for transform but not for compact
+      //  using elem_type =  typename detail::get_lambda<FuncType,C>::param_type;
+      //  static_assert(validate_container_function<elem_type, C>::value,
+      //                "the function does not accept the collection type as paramenter");
 
-        using value_type =  typename detail::get_lambda<FuncType,C>::return_type;
-        using storage_t = detail::chaineable_store_t<C, Storage_type>;
+        using value_type = Value_type;
+        using storage_t = detail::chaineable_store_t<Container, Storage_type>;
 
         FuncType func;
         storage_t store;

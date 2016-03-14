@@ -30,6 +30,8 @@ namespace func {
     struct SequenceIterator;
     template <typename T, typename V>
     struct ZipIterator;
+    template<typename V, typename S, typename F>
+    struct CompactIterator;
 }
 
 namespace std {
@@ -73,6 +75,14 @@ namespace std {
         using reference         = V&;
         using iterator_category = std::input_iterator_tag;
     };
+    template<typename V, typename S, typename F>
+    struct iterator_traits<func::CompactIterator<V,S,F>>{
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = V;
+        using pointer           = const V*;
+        using reference         = const V&;
+        using iterator_category = std::input_iterator_tag;
+    };
 }
 
 
@@ -107,6 +117,11 @@ namespace detail {
     template <typename Value, typename Category>
     struct iterator_type_aux<SequenceIterator<Value>, Value, Category> {
         static const bool is_parallel_iterator = true;
+    }
+    ;
+    template <typename Value, typename Source, typename Func, typename Category>
+    struct iterator_type_aux<CompactIterator<Value, Source, Func>, Value, Category> {
+        static const bool is_parallel_iterator = false;
     };
 
     template <typename Source, typename Value, typename Category>

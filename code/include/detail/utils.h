@@ -100,6 +100,12 @@ namespace detail {
         using ret_type = decltype(dummy_f(dummy_value));
     };
 
+    template <typename F, typename VT>
+    struct get_ret_type_for_lambda2{
+        static VT dummy_value;
+        static F dummy_f;
+        using ret_type = decltype(dummy_f(dummy_value, dummy_value));
+    };
 //    template <typename F, typename C>
 //    void test(F f, C c){
 //
@@ -119,6 +125,14 @@ namespace detail {
     };
 
 
+    template <typename F, typename C>
+    struct get_lambda_iterator{
+    private:
+        using collection_type = typename get_collection_type<C>::type;
+    public:
+        using param_type = typename std::remove_reference_t<C>::iterator;
+        using return_type = typename get_ret_type_for_lambda2<F, param_type>::ret_type;
+    };
 
     template <typename N, typename C>
     struct get_lambda<std::function<N(N)>, C>{

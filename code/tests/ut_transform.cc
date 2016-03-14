@@ -28,7 +28,6 @@
 
 #include <random>
 
-
 #include "transform.h"
 
 using namespace testing;
