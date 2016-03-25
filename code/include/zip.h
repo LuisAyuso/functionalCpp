@@ -186,6 +186,7 @@ namespace func{
         }
     }
 
+namespace it{
     // iterator
     template <typename T, typename Value>
     struct ZipIterator : public detail::iterator_type<ZipIterator<T,Value>, Value> {
@@ -271,9 +272,9 @@ namespace func{
             sizes(source, o.source, s);
             return *std::min_element(s.begin(),s.end());
         }
-
     };
 
+} // namespace iterator
 
     // chainable
     template <typename... Args>
@@ -284,7 +285,7 @@ namespace func{
 
         using value_type = get_value_type_t<typename Args::stored_type::value_type...>;
         using inner_iterator_type = get_value_type_t<typename Args::stored_type::iterator...>;
-        using iterator = ZipIterator<inner_iterator_type, value_type>;
+        using iterator = it::ZipIterator<inner_iterator_type, value_type>;
 
         /*
          * it only accepts rvalues to intialize,
@@ -302,6 +303,8 @@ namespace func{
     };
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+namespace{
     template <typename T>
     constexpr detail::val_t<T> get_storage(T&& v) {
         return detail::val_t<T>(std::move(v));
@@ -311,7 +314,8 @@ namespace func{
     constexpr detail::ref_t<T> get_storage(T& v) {
         return detail::ref_t<T>(v);
     }
-
+}
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     template <typename... Args>
     zip_t<detail::choose_storage_t<func::detail::get_reference_t<Args>>...> zip (Args&&... a) {
         using namespace func::detail;
@@ -319,4 +323,3 @@ namespace func{
     }
 
 }
-

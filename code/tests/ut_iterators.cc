@@ -127,8 +127,8 @@ TEST (Iterators, parallel_iterator) {
     using list = std::list<int>;
     ASSERT_TRUE( (std::is_same< vec::iterator::iterator_category, std::random_access_iterator_tag>()) );
 
-    using transform_par = func::TransformIterator<int,vec::iterator,std::function<int(int)>>;
-    using transform_no_par = func::TransformIterator<int,list::iterator,std::function<int(int)>>;
+    using transform_par = func::it::TransformIterator<int,vec::iterator,std::function<int(int)>>;
+    using transform_no_par = func::it::TransformIterator<int,list::iterator,std::function<int(int)>>;
 
     ASSERT_TRUE( (std::is_same< transform_par::iterator_category, std::input_iterator_tag>()) );
     ASSERT_TRUE( (std::is_same< transform_par::iterator::iterator_category, std::input_iterator_tag>()) );
@@ -137,27 +137,27 @@ TEST (Iterators, parallel_iterator) {
     ASSERT_TRUE(transform_par::is_parallel_iterator);
     ASSERT_FALSE(transform_no_par::is_parallel_iterator);
 
-    using filter_vec = func::FilterIterator<int,vec::iterator,std::function<int(int)>>;
-    using filter_list = func::FilterIterator<int,list::iterator,std::function<int(int)>>;
+    using filter_vec = func::it::FilterIterator<int,vec::iterator,std::function<int(int)>>;
+    using filter_list = func::it::FilterIterator<int,list::iterator,std::function<int(int)>>;
     ASSERT_FALSE(filter_vec::is_parallel_iterator);
     ASSERT_FALSE(filter_list::is_parallel_iterator);
 
-    using nested_par = func::TransformIterator<int,transform_par,std::function<int(int)>>;
-    using nested_no_par = func::TransformIterator<int,transform_no_par,std::function<int(int)>>;
+    using nested_par = func::it::TransformIterator<int,transform_par,std::function<int(int)>>;
+    using nested_no_par = func::it::TransformIterator<int,transform_no_par,std::function<int(int)>>;
     ASSERT_TRUE(nested_par::is_parallel_iterator);
     ASSERT_FALSE(nested_no_par::is_parallel_iterator);
 
-    using filter_trans = func::FilterIterator<int,transform_par,std::function<int(int)>>;
-    using trans_filter = func::TransformIterator<int,filter_vec,std::function<int(int)>>;
+    using filter_trans = func::it::FilterIterator<int,transform_par,std::function<int(int)>>;
+    using trans_filter = func::it::TransformIterator<int,filter_vec,std::function<int(int)>>;
     ASSERT_FALSE(filter_trans::is_parallel_iterator);
     ASSERT_FALSE(trans_filter::is_parallel_iterator);
 
-    using zip_par = func::ZipIterator<std::pair<vec::iterator,vec::iterator>, std::pair<int,int>>;
-    using zip_par_one = func::ZipIterator<std::pair<transform_par,transform_par>, std::pair<int,int>>;
-    using zip_par_two = func::ZipIterator<std::pair<transform_par,filter_vec>, std::pair<int,int>>;
-    using zip_no_par = func::ZipIterator<std::pair<vec::iterator,list::iterator>, std::pair<int,int>>;
-    using zip_no_par_one = func::ZipIterator<std::pair<list::iterator,vec::iterator>, std::pair<int,int>>;
-    using zip_no_par_two = func::ZipIterator<std::pair<list::iterator,list::iterator>, std::pair<int,int>>;
+    using zip_par = func::it::ZipIterator<std::pair<vec::iterator,vec::iterator>, std::pair<int,int>>;
+    using zip_par_one = func::it::ZipIterator<std::pair<transform_par,transform_par>, std::pair<int,int>>;
+    using zip_par_two = func::it::ZipIterator<std::pair<transform_par,filter_vec>, std::pair<int,int>>;
+    using zip_no_par = func::it::ZipIterator<std::pair<vec::iterator,list::iterator>, std::pair<int,int>>;
+    using zip_no_par_one = func::it::ZipIterator<std::pair<list::iterator,vec::iterator>, std::pair<int,int>>;
+    using zip_no_par_two = func::it::ZipIterator<std::pair<list::iterator,list::iterator>, std::pair<int,int>>;
     ASSERT_TRUE(zip_par::is_parallel_iterator);
     ASSERT_TRUE(zip_par_one::is_parallel_iterator);
     ASSERT_FALSE(zip_par_two::is_parallel_iterator);

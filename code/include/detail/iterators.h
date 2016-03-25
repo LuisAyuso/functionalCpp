@@ -22,6 +22,7 @@
 #include <functional>
 
 namespace func {
+namespace it {
     template <typename V, typename S, typename F>
     struct TransformIterator;
     template <typename V, typename S, typename F>
@@ -31,7 +32,8 @@ namespace func {
     template <typename T, typename V>
     struct ZipIterator;
     template<typename V, typename S, typename F>
-    struct CompactIterator;
+    struct MuxIterator;
+}
 }
 
 namespace std {
@@ -41,7 +43,7 @@ namespace std {
     //  espetializations so everyone is happy
 
     template<typename V, typename S, typename F>
-    struct iterator_traits<func::TransformIterator<V,S,F>>{
+    struct iterator_traits<func::it::TransformIterator<V,S,F>>{
         using difference_type   = typename std::iterator_traits<S>::difference_type;
         using value_type        = V;
         using pointer           = const V*;
@@ -50,7 +52,7 @@ namespace std {
     };
 
     template<typename V, typename S, typename F>
-    struct iterator_traits<func::FilterIterator<V,S,F>>{
+    struct iterator_traits<func::it::FilterIterator<V,S,F>>{
         using difference_type   = typename std::iterator_traits<S>::difference_type;
         using value_type        = V;
         using pointer           = const V*;
@@ -59,7 +61,7 @@ namespace std {
     };
 
     template<typename V>
-    struct iterator_traits<func::SequenceIterator<V>>{
+    struct iterator_traits<func::it::SequenceIterator<V>>{
         using difference_type   = std::ptrdiff_t;
         using value_type        = V;
         using pointer           = V*;
@@ -68,7 +70,7 @@ namespace std {
     };
 
     template<typename I, typename V>
-    struct iterator_traits<func::ZipIterator<I,V>>{
+    struct iterator_traits<func::it::ZipIterator<I,V>>{
         using difference_type   =  std::ptrdiff_t;
         using value_type        = V;
         using pointer           = V*;
@@ -76,7 +78,7 @@ namespace std {
         using iterator_category = std::input_iterator_tag;
     };
     template<typename V, typename S, typename F>
-    struct iterator_traits<func::CompactIterator<V,S,F>>{
+    struct iterator_traits<func::it::MuxIterator<V,S,F>>{
         using difference_type   = std::ptrdiff_t;
         using value_type        = V;
         using pointer           = const V*;
@@ -105,38 +107,38 @@ namespace detail {
     };
 
     template <typename Value, typename Source, typename Func, typename Category>
-    struct iterator_type_aux<TransformIterator<Value, Source, Func>, Value, Category> {
+    struct iterator_type_aux<it::TransformIterator<Value, Source, Func>, Value, Category> {
         static const bool is_parallel_iterator = iterator_type<Source, Value>::is_parallel_iterator;
     };
 
     template <typename Value, typename Source, typename Func, typename Category>
-    struct iterator_type_aux<FilterIterator<Value, Source, Func>, Value, Category> {
+    struct iterator_type_aux<it::FilterIterator<Value, Source, Func>, Value, Category> {
         static const bool is_parallel_iterator = false;
     };
 
     template <typename Value, typename Category>
-    struct iterator_type_aux<SequenceIterator<Value>, Value, Category> {
+    struct iterator_type_aux<it::SequenceIterator<Value>, Value, Category> {
         static const bool is_parallel_iterator = true;
     }
     ;
     template <typename Value, typename Source, typename Func, typename Category>
-    struct iterator_type_aux<CompactIterator<Value, Source, Func>, Value, Category> {
+    struct iterator_type_aux<it::MuxIterator<Value, Source, Func>, Value, Category> {
         static const bool is_parallel_iterator = false;
     };
 
     template <typename Source, typename Value, typename Category>
-    struct iterator_type_aux<ZipIterator<Source, Value>, Value, Category> {
+    struct iterator_type_aux<it::ZipIterator<Source, Value>, Value, Category> {
         using first_iter = typename std::tuple_element<0,Source>::type;
         using first_value = typename std::tuple_element<0,Value>::type;
         using new_iter_tuple = typename detail::remove_first_type<Source>::type;
         using new_value_tuple = typename detail::remove_first_type<Value>::type;
 
         static const bool is_parallel_iterator = iterator_type<first_iter, first_value>::is_parallel_iterator &&
-                    iterator_type<ZipIterator<new_iter_tuple, new_value_tuple>, new_value_tuple>::is_parallel_iterator;
+                    iterator_type<it::ZipIterator<new_iter_tuple, new_value_tuple>, new_value_tuple>::is_parallel_iterator;
     };
 
     template <typename Category>
-    struct iterator_type_aux<ZipIterator<std::tuple<>, std::tuple<>>, std::tuple<>, Category> {
+    struct iterator_type_aux<it::ZipIterator<std::tuple<>, std::tuple<>>, std::tuple<>, Category> {
         static const bool is_parallel_iterator = true;
     };
 

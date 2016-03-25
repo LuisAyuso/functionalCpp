@@ -1,5 +1,5 @@
-/** 
-	FunctionalCpp,  A header only library for chainable functional operations 
+/**
+	FunctionalCpp,  A header only library for chainable functional operations
 	in C++ collections
     Copyright (C) 2016 Luis F. Ayuso & Stefan Moosbrugger
 
@@ -24,7 +24,8 @@
 #include "detail/utils.h"
 
 namespace func{
-    
+namespace {
+
     template <typename N, typename R, typename C>
     N reduce_aux(std::function<R (R, N)>& f, C& c, R def){
         auto it = c.begin();
@@ -38,8 +39,8 @@ namespace func{
         }
         return def;
     }
+} // anonimous namespace
 
-    
     // for function type
     // lvalue collection
     template <typename N, typename R, typename C>

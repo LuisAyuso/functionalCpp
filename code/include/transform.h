@@ -25,6 +25,7 @@
 #include "detail/chaineable.h"
 
 namespace func{
+namespace it{
 
     template<typename Value, typename Source, typename Func>
     struct TransformIterator : public detail::iterator_type<TransformIterator<Value, Source, Func>, Value> {
@@ -119,15 +120,15 @@ namespace func{
         }
 
     };
-
+} // it namespace
 
    template <typename FuncType, typename Container, typename Storage_type>
     using transform_t = detail::chaineable_t<
-                            FuncType, 
-                            Container, 
-                            Storage_type, 
+                            FuncType,
+                            Container,
+                            Storage_type,
                             typename detail::get_lambda<FuncType,Container>::return_type,
-                            TransformIterator<typename detail::get_lambda<FuncType,Container>::return_type, typename Container::iterator, FuncType > // specific iterator type for transformation
+                            it::TransformIterator<typename detail::get_lambda<FuncType,Container>::return_type, typename Container::iterator, FuncType > // specific iterator type for transformation
                                 >;
 
 
@@ -163,4 +164,3 @@ namespace func{
         return transform_t<F,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
     }
 }
-

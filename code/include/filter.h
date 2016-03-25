@@ -25,7 +25,7 @@
 #include "detail/chaineable.h"
 
 namespace func{
-
+namespace it{
     template<typename Value, typename Source, typename Func>
     struct FilterIterator: public detail::iterator_type<FilterIterator<Value, Source, Func>, Value>  {
 
@@ -101,14 +101,15 @@ namespace func{
             return cpy;
         }
     };
+} // it namespace
 
     template <typename FuncType, typename Container, typename Storage_type>
     using filter_t = detail::chaineable_t<
-                            FuncType, 
-                            Container, 
+                            FuncType,
+                            Container,
                             Storage_type,
                             typename Container::value_type,
-                            FilterIterator<typename Container::value_type, typename Container::iterator, FuncType > // specific iterator type for transformation
+                            it::FilterIterator<typename Container::value_type, typename Container::iterator, FuncType > // specific iterator type for transformation
                                 >;
 
     // for function type
@@ -142,6 +143,3 @@ namespace func{
 //        return filter_t<N,C,detail::Value_storage> (f, detail::chaineable_store_t<C,detail::Value_storage> (std::move(c)));
 //    }
 }
-
-
-

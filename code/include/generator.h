@@ -24,6 +24,7 @@
 #include "detail/chaineable.h"
 
 namespace func{
+namespace it{
 
     template<typename Value>
     struct SequenceIterator: public detail::iterator_type<SequenceIterator<Value>, Value> {
@@ -117,12 +118,13 @@ namespace func{
             return count-o.count;
         }
     };
+} // it namespace
 
     template <typename T>
     struct sequenece_t {
 
         using value_type = T;
-        using iterator = SequenceIterator<T>;
+        using iterator = it::SequenceIterator<T>;
 
         const T init, step;
         const size_t count;
@@ -136,11 +138,11 @@ namespace func{
         {}
 
         iterator begin() {
-            return SequenceIterator<T>(init, step, count);
+            return iterator(init, step, count);
         }
 
         iterator end() {
-            return SequenceIterator<T>();
+            return iterator();
         }
     };
 
@@ -159,6 +161,3 @@ namespace func{
     }
 
 }
-
-
-
