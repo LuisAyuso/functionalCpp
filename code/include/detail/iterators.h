@@ -33,6 +33,8 @@ namespace it {
     struct ZipIterator;
     template<typename V, typename S, typename F>
     struct MuxIterator;
+    template<typename V, typename S, typename F>
+    struct DemuxIterator;
 }
 }
 
@@ -85,6 +87,14 @@ namespace std {
         using reference         = const V&;
         using iterator_category = std::input_iterator_tag;
     };
+    template<typename V, typename S, typename F>
+    struct iterator_traits<func::it::DemuxIterator<V,S,F>>{
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = V;
+        using pointer           = const V*;
+        using reference         = const V&;
+        using iterator_category = std::input_iterator_tag;
+    };
 }
 
 
@@ -119,10 +129,15 @@ namespace detail {
     template <typename Value, typename Category>
     struct iterator_type_aux<it::SequenceIterator<Value>, Value, Category> {
         static const bool is_parallel_iterator = true;
-    }
-    ;
+    };
+
     template <typename Value, typename Source, typename Func, typename Category>
     struct iterator_type_aux<it::MuxIterator<Value, Source, Func>, Value, Category> {
+        static const bool is_parallel_iterator = false;
+    };
+
+    template <typename Value, typename Source, typename Func, typename Category>
+    struct iterator_type_aux<it::DemuxIterator<Value, Source, Func>, Value, Category> {
         static const bool is_parallel_iterator = false;
     };
 

@@ -71,7 +71,7 @@ namespace detail{
              typename FuncType,         // type of the function
              typename Container,        // container type
              typename Storage_type,     // kind of storage (reference or value)
-             typename Value_type,       // what values this chainable will produce 
+             typename Value_type,       // what values this chainable will produce
              typename Iterator          // what kind of iterator this chaineable will provide
                  >
     struct chaineable_t{
@@ -142,4 +142,3 @@ namespace detail{
 
 }// detail namespace
 }// func namespace
-

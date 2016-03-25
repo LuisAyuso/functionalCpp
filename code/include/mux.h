@@ -38,7 +38,7 @@ namespace it{
         using source_type = Source;
         using self_type = MuxIterator<Value, Source, Func>;
 
-        MuxIterator(Func& f, const Source s, const Source e)
+        MuxIterator(Func& f, const Source& s, const Source& e)
         :f(f), s(s), e(e), pre_end(false){
             if(s == e)  return;
             last_value = f(this->s, this->e);
@@ -81,7 +81,7 @@ namespace it{
         }
 
         const Value* operator-> () const{
-            return last_value;
+            return &last_value;
         }
 
         self_type& operator++(){

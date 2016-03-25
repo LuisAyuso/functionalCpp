@@ -36,7 +36,7 @@ namespace it{
 
         using self_type = FilterIterator<Value, Source, Func>;
 
-        FilterIterator(Func& f, const Source beg, const Source end)
+        FilterIterator(Func& f, const Source& beg, const Source& end)
         :f(f), s(beg), end(end) {
             while(s != end && !f(*s)){
                 ++s;

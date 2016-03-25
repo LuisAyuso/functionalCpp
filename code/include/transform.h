@@ -36,7 +36,7 @@ namespace it{
         using source_type = Source;
         using self_type = TransformIterator<Value, Source, Func>;
 
-        TransformIterator(Func& f, const Source s, const Source)
+        TransformIterator(Func& f, const Source& s, const Source&)
         :f(f), s(s) {}
 
         TransformIterator(const TransformIterator& o)
