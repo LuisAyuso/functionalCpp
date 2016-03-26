@@ -22,7 +22,7 @@ Merge N collections into a collection of aggregates. If two collections, produce
 ###Reduce:
 Reduce, compute some scalar value based on all elements in collection.
 
-# mux / demux
+###mux / demux
 The *mux* operation converts a series of elements in the input into a single output.
 The *demux* operation converts a single element from the input into a series of output elements.
 
