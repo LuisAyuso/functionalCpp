@@ -3,6 +3,20 @@
 Chainable user defined operators for C++ collections.
 Wait, What does this mean?
 
+```c++
+    std::vector<unsigned>  input1 (100);
+    std::vector<int>       input2 (100);
+    
+    
+    auto x = func::zip(input1, 
+                       func::transform( [](unsigned x) -> float { return x+0.1; },
+                       func::filter( [](unsigned x) -> bool { return x%2; },
+                       func::transform( [](int x) -> unsigned { return x<0? -x: x; }, input2))));
+```
+Variable x is a collection where each element is a pair<unsigned, float>.
+The first element comes from the input1 while the second is the result of executing some operations in input2 elements.
+Each computation will be lazy evaluated when x is iterated.
+
 ## Background
 
 Not so long time ago, I had the chance of program some python I found myself writing long chains of _map_ / _filter_  / _reduce_  calls.
@@ -22,7 +36,7 @@ Merge N collections into a collection of aggregates. If two collections, produce
 ###Reduce:
 Reduce, compute some scalar value based on all elements in collection.
 
-###mux / demux
+###Mux / Demux
 The *mux* operation converts a series of elements in the input into a single output.
 The *demux* operation converts a single element from the input into a series of output elements.
 
